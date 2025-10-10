@@ -1,4 +1,4 @@
-import getAllUserService from "../services/getAllUsersServices.service.js";
+import getAllUserService from "../../services/userServices/getAllUsers.service.js";
 
 const getAllUserController = async (req, res) => {
     try {

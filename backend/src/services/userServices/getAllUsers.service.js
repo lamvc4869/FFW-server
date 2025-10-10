@@ -1,4 +1,4 @@
-import User from "../models/user.model.js";
+import User from "../../models/user.model.js";
 
 const getAllUserService = async () => {
     try {
@@ -9,7 +9,7 @@ const getAllUserService = async () => {
         });
         return listUsers;
     } catch (error) {
-        throw error;
+        return error;
     }
 };
 

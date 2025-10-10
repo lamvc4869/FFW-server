@@ -1,4 +1,4 @@
-import logoutUserService from "../services/logoutUserService.service.js";
+import logoutUserService from "../../services/userServices/logoutUser.service.js";
 
 const logoutUserController = async (req, res) => {
   try {

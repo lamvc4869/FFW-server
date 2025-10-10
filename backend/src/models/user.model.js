@@ -2,11 +2,16 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
     {
+        firstName: {
+            type: String,
+        },
+        lastName: {
+            type: String,
+        },
         email: {
             type: String,
             required: true,
             unique: true,
-            trim: true,
         },
         password: {
             type: String,
@@ -17,9 +22,14 @@ const userSchema = new mongoose.Schema(
             enum: ['user', 'admin'],
             default: 'user',
         },
-        refreshToken: {
+        age: {
+            type: Number,
+        },
+        address: {
             type: String,
-            default: null,
+        },
+        phoneNumber: {
+            type: String,
         }
     }, 
     { timestamps: true }
