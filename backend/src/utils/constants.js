@@ -1,0 +1,1 @@
+export const GENERAL_API = '/api/v1';
