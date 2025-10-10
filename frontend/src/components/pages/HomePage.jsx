@@ -36,7 +36,7 @@ const HomePage = () => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
         toast.success("Đăng xuất thành công!");
-        setTimeout(() => navigate("/login"), 800);
+        navigate('/login');
       } else {
         toast.error(data.message || "Access Token đã hết hạn.");
       }

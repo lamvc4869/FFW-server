@@ -13,12 +13,6 @@ const SignIn = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (!email || !password) {
-      toast.error("Vui lòng điền đầy đủ thông tin");
-      setIsLoading(false);
-      return;
-    }
-
     try {
       const res = await axios.post(
         "http://localhost:3000/api/v1/login",
@@ -32,7 +26,7 @@ const SignIn = () => {
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(user));
         toast.success("Đăng nhập thành công!");
-        setTimeout(() => navigate("/home"), 800);
+        navigate('/home');
       }
     } catch (err) {
       if (err.response) toast.error(err.response.data.message || "Đăng nhập thất bại");
