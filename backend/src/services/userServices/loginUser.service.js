@@ -19,40 +19,30 @@ const loginUserService = async (payload) => {
       return "Sai mật khẩu";
     }
 
+    const tokenSecret = existingAccount.role === 'admin'
+      ? process.env.ADMIN_ACCESS_TOKEN_SECRET
+      : process.env.USER_ACCESS_TOKEN_SECRET;
+
     const accessToken = jwt.sign(
       {
         id: existingAccount._id,
         email: existingAccount.email,
         role: existingAccount.role,
       },
-      process.env.ACCESS_TOKEN_SECRET,
+      tokenSecret,
       {
         expiresIn: process.env.ACCESS_TOKEN_EXPIRES,
       }
     );
 
-    const refreshToken = jwt.sign(
-      {
-        id: existingAccount._id,
-      },
-      process.env.REFRESH_TOKEN_SECRET,
-      {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRES,
-      }
-    );
-
-    existingAccount.refreshToken = refreshToken;
-    await existingAccount.save();
-
-    const { password: _pw, __v, refreshToken: _rt, ...safeUser } = existingAccount.toObject();
+    const { password: _pw, __v, ...safeUser } = existingAccount.toObject();
 
     return {
         user: safeUser,
         accessToken,
-        refreshToken,
     }
   } catch (error) {
-    throw error;
+    return error.message;
   }
 };
 
