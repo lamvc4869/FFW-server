@@ -12,8 +12,7 @@ const verifyToken = async (req, res, next) => {
     }
 
     const token = authHeader.substring("Bearer ".length);
-    
-    // Kiểm tra token có trong blacklist không
+
     if (isTokenBlacklisted(token)) {
       return res.status(401).json({
         message: "Token đã bị vô hiệu hóa, vui lòng đăng nhập lại",

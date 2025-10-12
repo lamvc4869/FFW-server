@@ -36,4 +36,3 @@ const verifyUser = verifyRole(['user']);
 const verifyUserOrAdmin = verifyRole(['user', 'admin']);
 
 export { verifyRole, verifyAdmin, verifyUser, verifyUserOrAdmin };
-export default verifyRole;

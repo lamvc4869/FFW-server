@@ -3,13 +3,6 @@ import getUserStatsService from "../../services/adminServices/getUserStats.servi
 const getUserStatsController = async (req, res) => {
   try {
     const result = await getUserStatsService();
-    
-    if (typeof result === 'string') {
-      return res.status(400).json({
-        message: result,
-        success: false,
-      });
-    }
 
     return res.status(200).json({
       message: "Lấy thống kê user thành công",

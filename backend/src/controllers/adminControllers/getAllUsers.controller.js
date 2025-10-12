@@ -3,13 +3,6 @@ import getAllUsersService from "../../services/adminServices/getAllUsers.service
 const getAllUsersController = async (req, res) => {
   try {
     const result = await getAllUsersService();
-    
-    if (typeof result === 'string') {
-      return res.status(400).json({
-        message: result,
-        success: false,
-      });
-    }
 
     return res.status(200).json({
       message: "Lấy danh sách user thành công",

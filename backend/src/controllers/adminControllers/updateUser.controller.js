@@ -4,7 +4,7 @@ const updateUserController = async (req, res) => {
   try {
     const { userId } = req.params;
     const updateData = req.body;
-    
+
     if (!updateData || Object.keys(updateData).length === 0) {
       return res.status(400).json({
         message: "Không có dữ liệu để cập nhật",
@@ -20,13 +20,6 @@ const updateUserController = async (req, res) => {
     }
 
     const result = await updateUserService(userId, updateData);
-    
-    if (typeof result === 'string') {
-      return res.status(400).json({
-        message: result,
-        success: false,
-      });
-    }
 
     return res.status(200).json({
       message: "Cập nhật user thành công",
