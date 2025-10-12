@@ -3,7 +3,6 @@ import createUserController from "../controllers/userControllers/registerUser.co
 import loginUserController from "../controllers/userControllers/loginUser.controller.js";
 import logoutUserController from "../controllers/userControllers/logoutUser.controller.js";
 import verifyToken from "../middlewares/verifyToken.middleware.js";
-import { verifyUserOrAdmin } from "../middlewares/verifyRole.middleware.js";
 
 const router = express.Router();
 
