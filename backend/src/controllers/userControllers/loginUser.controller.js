@@ -17,7 +17,6 @@ const loginUserController = async (req, res) => {
       success: true,
       user: result.user,
       accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
     });
   } catch (error) {
     return res.status(500).json({

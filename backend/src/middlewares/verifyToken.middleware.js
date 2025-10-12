@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { isTokenBlacklisted } from "../utils/tokenBlacklist.js";
 
 const verifyToken = async (req, res, next) => {
   try {
@@ -11,7 +12,42 @@ const verifyToken = async (req, res, next) => {
     }
 
     const token = authHeader.substring("Bearer ".length);
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    if (isTokenBlacklisted(token)) {
+      return res.status(401).json({
+        message: "Token đã bị vô hiệu hóa, vui lòng đăng nhập lại",
+        success: false,
+      });
+    }
+
+    let decoded;
+
+
+    const adminSecret = process.env.ADMIN_ACCESS_TOKEN_SECRET;
+    const userSecret = process.env.USER_ACCESS_TOKEN_SECRET;
+    const legacySecret = process.env.ACCESS_TOKEN_SECRET;
+
+    if (!adminSecret || !userSecret || !legacySecret) {
+      return res.status(500).json({
+        message: "Cấu hình server chưa đầy đủ",
+        success: false,
+      });
+    }
+
+    try {
+      decoded = jwt.verify(token, adminSecret);
+    } catch (adminError) {
+      try {
+        decoded = jwt.verify(token, userSecret);
+      } catch (userError) {
+        try {
+          decoded = jwt.verify(token, legacySecret);
+        } catch (legacyError) {
+          return 'Invalid token'
+        }
+      }
+    }
+
     req.user = decoded;
     next();
   } catch (error) {

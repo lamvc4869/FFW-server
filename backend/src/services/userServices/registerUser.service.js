@@ -3,9 +3,13 @@ import bcrypt from 'bcrypt'
 
 const createUserService = async (userData) => {
     try {
-        const { email, password } = userData;
+        const { email, password, role = 'user' } = userData;
         if (!email || !password) {
             return 'Không được nhập thiếu thông tin nào';
+        }
+
+        if (role === 'admin' && userData.adminSecret !== process.env.ADMIN_CREATION_SECRET) {
+            return 'Không có quyền tạo tài khoản admin';
         }
 
         const existingEmail = await User.findOne({ email });
@@ -17,15 +21,17 @@ const createUserService = async (userData) => {
 
         const newUser = new User({
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: role
         });
 
         await newUser.save();
         return {
-            email
+            email,
+            role: newUser.role
         };
     } catch (error) {
-        throw error;
+        return error.message;
     }
 };
 

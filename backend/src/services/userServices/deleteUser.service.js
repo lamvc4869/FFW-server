@@ -8,7 +8,7 @@ const deleteUserService = async (userId) => {
         }
         return 'User deleted successfully';
     } catch (error) {
-        return error;
+        return error.message;
     }
 };
 
