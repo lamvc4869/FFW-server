@@ -5,7 +5,7 @@ import {GENERAL_API, ADMIN_API} from "./src/utils/constants.js";
 import { connectDB } from "./src/utils/db.js";
 import userRoute from "./src/routes/user.route.js";
 import adminRoute from "./src/routes/admin.route.js";
-import connectCloudinary from "./src/utils/cloudinary.js";
+import { connectCloudinary } from "./src/utils/cloudinary.js";
 
 dotenv.config();
 const app = express();
