@@ -8,7 +8,8 @@ import updateUserController from "../controllers/adminControllers/updateUser.con
 import getUserStatsController from "../controllers/adminControllers/getUserStats.controller.js";
 import createProductController from "../controllers/adminControllers/createProduct.controller.js";
 import deleteProductController from "../controllers/adminControllers/deleteProduct.controller.js";
-import getAllProductsController from "../controllers/adminControllers/getAllProducts.controller.js";
+import getAllProductsController from "../controllers/sharedControllers/getAllProducts.controller.js";
+import searchProductByNameController from "../controllers/sharedControllers/searchProductByName.controller.js";
 
 const router = express.Router();
 
@@ -23,5 +24,6 @@ router.patch("/user/:userId", updateUserController);
 router.get('/products', getAllProductsController);
 router.post("/product", upload.array("image", 4), createProductController);
 router.delete("/product/:productId", deleteProductController);
+router.get('/product/search', searchProductByNameController);
 
 export default router;

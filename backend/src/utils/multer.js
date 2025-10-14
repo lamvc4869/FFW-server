@@ -11,9 +11,14 @@ export const upload = multer({
     },
   }),
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|webp/;
+    const allowedExt = /jpeg|jpg|png|webp/;
     const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedTypes.test(ext)) cb(null, true);
-    else cb(new Error("Chỉ được upload ảnh (jpg, jpeg, png, webp)"));
+    const mime = file.mimetype;
+
+    if (allowedExt.test(ext) && mime.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Chỉ được upload ảnh (jpg, jpeg, png, webp)"));
+    }
   },
 });

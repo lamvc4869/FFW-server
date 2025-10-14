@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 const connectCloudinary = async () => {
   cloudinary.config({
@@ -9,14 +10,21 @@ const connectCloudinary = async () => {
 };
 
 const uploadToCloudinary = async (imagePath) => {
-    try {
-        const result = await cloudinary.uploader.upload(imagePath, {
-          folder: 'products'
-        });
-        return result.secure_url;
-    } catch (error) {
-        return 'Upload failed';
-    }
+  try {
+    const result = await cloudinary.uploader.upload(imagePath, {
+      folder: "products",
+    });
+    
+    fs.unlink(imagePath, (err) => {
+      if (err) console.error("Lỗi khi xóa file tạm:", err);
+      else console.log(`Đã xóa file tạm: ${imagePath}`);
+    });
+
+    return result.secure_url;
+  } catch (error) {
+    console.error("Upload thất bại:", error);
+    return "Upload failed";
+  }
 };
 
 export { connectCloudinary, uploadToCloudinary };
