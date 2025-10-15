@@ -11,46 +11,10 @@ const orderSchema = new mongoose.Schema(
             type: String,
             unique: true,
         },
-        items: [{
-            productId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Product',
-            },
-            name: {
-                type: String,
-            },
-            image: {
-                type: String,
-            },
-            quantity: {
-                type: Number,
-            },
-            price: {
-                type: Number,
-            },
-            total: {
-                type: Number,
-            },
-        }],
-        shippingAddress: {
-            name: {
-                type: String,
-            },
-            phone: {
-                type: String,
-            },
-            street: {
-                type: String,
-            },
-            city: {
-                type: String,
-            },
-            zipcode: {
-                type: String,
-            },
-            country: {
-                type: String,
-            },
+        cartId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Cart',
+            required: true,
         },
         paymentMethod: {
             type: String,
@@ -69,10 +33,6 @@ const orderSchema = new mongoose.Schema(
         subtotal: {
             type: Number,
         },
-        shippingFee: {
-            type: Number,
-            default: 0,
-        },
         discount: {
             type: Number,
             default: 0,
@@ -82,12 +42,6 @@ const orderSchema = new mongoose.Schema(
         },
         notes: {
             type: String,
-        },
-        estimatedDelivery: {
-            type: Date,
-        },
-        deliveredAt: {
-            type: Date,
         },
     },
     { timestamps: true }

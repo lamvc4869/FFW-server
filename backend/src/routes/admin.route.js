@@ -10,6 +10,7 @@ import createProductController from "../controllers/adminControllers/createProdu
 import deleteProductController from "../controllers/adminControllers/deleteProduct.controller.js";
 import getAllProductsController from "../controllers/sharedControllers/getAllProducts.controller.js";
 import searchProductByNameController from "../controllers/sharedControllers/searchProductByName.controller.js";
+import updateProductController from "../controllers/adminControllers/updateProduct.controller.js";
 
 const router = express.Router();
 
@@ -25,5 +26,6 @@ router.get('/products', getAllProductsController);
 router.post("/product", upload.array("image", 4), createProductController);
 router.delete("/product/:productId", deleteProductController);
 router.get('/product/search', searchProductByNameController);
+router.patch('/product/:productId', upload.array("image", 4), updateProductController);
 
 export default router;
