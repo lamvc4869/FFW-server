@@ -12,6 +12,11 @@ const orderSchema = new mongoose.Schema(
             unique: true,
             required: true,
         },
+        cartId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'cart',
+            required: true,
+        },
         products: [{
             productId: {
                 type: mongoose.Schema.Types.ObjectId,
@@ -76,10 +81,6 @@ const orderSchema = new mongoose.Schema(
         subtotal: {
             type: Number,
         },
-        shippingFee: {
-            type: Number,
-            default: 0,
-        },
         discount: {
             type: Number,
             default: 0,
@@ -89,12 +90,6 @@ const orderSchema = new mongoose.Schema(
         },
         notes: {
             type: String,
-        },
-        estimatedDelivery: {
-            type: Date,
-        },
-        deliveredAt: {
-            type: Date,
         },
     },
     { timestamps: true }
