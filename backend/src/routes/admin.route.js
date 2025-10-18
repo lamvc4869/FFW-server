@@ -11,11 +11,14 @@ import deleteProductController from "../controllers/adminControllers/deleteProdu
 import getAllProductsController from "../controllers/sharedControllers/getAllProducts.controller.js";
 import searchProductByNameController from "../controllers/sharedControllers/searchProductByName.controller.js";
 import updateProductController from "../controllers/adminControllers/updateProduct.controller.js";
+import uploadAvatarController from "../controllers/sharedControllers/uploadAvatar.controller.js";
 
 const router = express.Router();
 
 router.use(verifyToken);
 router.use(verifyAdmin);
+
+router.post('/avatar/:userId', upload.single("avatar"), uploadAvatarController);
 
 router.get("/users", getAllUsersController);
 router.get("/stats", getUserStatsController);
