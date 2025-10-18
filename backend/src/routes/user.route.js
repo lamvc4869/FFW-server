@@ -15,6 +15,6 @@ router.post("/login", loginUserController);
 router.post("/logout", verifyToken, logoutUserController);
 router.get('/product/search', verifyToken, searchProductByNameController);
 router.get('/products', verifyToken, getAllProductsController);
-router.post('/upload', verifyToken, upload.single("avatar"), uploadAvatarController);
+router.post('/avatar/:userId', verifyToken, upload.single("avatar"), uploadAvatarController);
 
 export default router;
