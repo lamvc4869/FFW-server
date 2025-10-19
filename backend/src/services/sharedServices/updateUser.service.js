@@ -1,7 +1,8 @@
 import User from "../../models/user.model.js";
 import bcrypt from "bcrypt";
+import { uploadToCloudinary } from "../../utils/cloudinary.js";
 
-const updateUserService = async (userId, updateData) => {
+const updateUserService = async (userId, updateData, updateFile) => {
   try {
     if (!userId) {
       return "ID user không được để trống";
@@ -32,6 +33,10 @@ const updateUserService = async (userId, updateData) => {
           user[key] = value;
         }
       }
+    }
+
+    if (updateFile) {
+        user.avatar = await uploadToCloudinary(updateFile.path);
     }
 
     await user.save();
