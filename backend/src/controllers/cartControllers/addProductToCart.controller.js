@@ -26,7 +26,6 @@ const addProductToCartController = async (req, res) => {
             });
         }
 
-        // Validate each product in the array
         for (const product of products) {
             if (!product.productId) {
                 return res.status(400).json({

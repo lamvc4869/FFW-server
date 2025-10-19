@@ -7,7 +7,7 @@ const getAllCartsService = async () => {
     try {
         const carts = await Cart.find()
             .populate('userId', 'username email firstName lastName')
-            .populate('items.productId', 'name price image description')
+            .populate('products.productId', 'name price image description')
             .populate('orderId', 'orderNumber status')
             .sort({ createdAt: -1 });
 

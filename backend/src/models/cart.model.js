@@ -28,7 +28,7 @@ const cartSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        items: {
+        products: {
             type: [cartItemSchema],
             default: [],
         },
@@ -57,14 +57,8 @@ const cartSchema = new mongoose.Schema(
 );
 
 
-cartSchema.pre('save', function(next) {
-    this.totalAmount = (this.items || []).reduce((sum, it) => sum + (it.price * it.quantity), 0);
-    next();
-});
-
-
 cartSchema.index({ userId: 1 }, { unique: true });
-cartSchema.index({ 'items.productId': 1 });
+cartSchema.index({ 'products.productId': 1 });
 cartSchema.index({ userId: 1, status: 1 }, { unique: true, partialFilterExpression: { status: 'active' } });
 
 const Cart = mongoose.model("cart", cartSchema);

@@ -9,7 +9,7 @@ export const createCartService =  async (userId) => {
 
     cart = await Cart.create({
         userId,
-        items: [],
+        products: [],
         totalAmount: 0,
     });
 
