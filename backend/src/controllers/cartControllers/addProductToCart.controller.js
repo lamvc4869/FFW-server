@@ -46,8 +46,7 @@ const addProductToCartController = async (req, res) => {
         return res.status(200).json({
             message: result.message,
             success: true,
-            data: result.cart,
-            results: result.results
+            data: result.cart
         });
     } catch (error) {
         return res.status(500).json({
