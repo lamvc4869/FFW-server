@@ -4,6 +4,7 @@ const updateUserController = async (req, res) => {
   try {
     const { userId } = req.params;
     const updateData = req.body;
+    const updateFile = req.file;
 
     if (!updateData || Object.keys(updateData).length === 0) {
       return res.status(400).json({
@@ -19,7 +20,7 @@ const updateUserController = async (req, res) => {
       });
     }
 
-    const result = await updateUserService(userId, updateData);
+    const result = await updateUserService(userId, updateData, updateFile);
 
     return res.status(200).json({
       message: "Cập nhật user thành công",
