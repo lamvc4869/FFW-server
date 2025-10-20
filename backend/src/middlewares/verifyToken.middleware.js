@@ -43,7 +43,10 @@ const verifyToken = async (req, res, next) => {
         try {
           decoded = jwt.verify(token, legacySecret);
         } catch (legacyError) {
-          return 'Invalid token'
+          return res.status(401).json({
+            message: "Token không hợp lệ hoặc đã hết hạn",
+            success: false,
+          });
         }
       }
     }
