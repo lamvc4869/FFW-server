@@ -9,7 +9,10 @@ import { upload } from "../utils/multer.js";
 import updateUserController from "../controllers/sharedControllers/updateUser.controller.js";
 import { verifyUserOrAdmin } from "../middlewares/verifyRole.middleware.js";
 import getUserByIdController from "../controllers/sharedControllers/getUserById.controller.js";
-
+import getProductDetailController from "../controllers/sharedControllers/getProductDetail.controller.js";
+import { createOrderController } from "../controllers/sharedControllers/createOrder.controller.js";
+import { getOrdersByUserController } from "../controllers/sharedControllers/getOrdersByUser.controller.js";
+import { cancelOrderController } from "../controllers/sharedControllers/cancelOrder.controller.js";
 const router = express.Router();
 
 router.post("/register", createUserController);
@@ -25,5 +28,8 @@ router.patch(
   updateUserController
 );
 router.get("/user/:userId", verifyToken, getUserByIdController);
-
+router.get("/product/:productId", getProductDetailController);
+router.post("/order", verifyToken, createOrderController);
+router.get("/orders",verifyToken, getOrdersByUserController);
+router.patch("/order/:orderId/cancel", verifyToken, cancelOrderController);
 export default router;
