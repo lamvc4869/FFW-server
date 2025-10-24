@@ -1,12 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&display=swap");
 @import "tailwindcss";
 
-/* Apply Outfit font as default */
+/* Apply Be Vietnam Pro font as default */
 body {
-  font-family: 'Outfit', sans-serif;
+  font-family:
+    "Be Vietnam Pro",
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-weight: 400;
   line-height: 1.5;
-  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Custom animations for login modal */

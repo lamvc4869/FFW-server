@@ -9,8 +9,6 @@ const ProductCard = ({ product }) => {
     useAppContext();
   const navigate = useNavigate();
 
-  
-
   // Get cart item count
   const getCartItemCount = (itemId) => {
     return cartItems[itemId] || 0;
@@ -112,18 +110,16 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Rating */}
-        <div className="flex items-center gap-0.5 mb-2">
-          {Array(5)
-            .fill("")
-            .map((_, i) => (
-              <img
-                key={i}
-                src={i < 4 ? images.star_icon : images.star_dull_icon}
-                alt="star"
-                className="w-2.5 h-2.5"
-              />
-            ))}
-          <span className="text-gray-500 text-xs ml-1">(4.0)</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            <img src={images.star_icon} alt="star" className="w-3 h-3" />
+            <span className="text-gray-500 text-xs ml-1">
+              {product.averageRating.toFixed(1)}
+            </span>
+          </div>
+          <span className="text-gray-500 text-xs">
+            Đã bán {product.sold}
+          </span>
         </div>
 
         {/* Price */}
@@ -148,7 +144,7 @@ const ProductCard = ({ product }) => {
               className="w-full flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-1.5 rounded-md font-medium transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md text-xs border border-gray-200 hover:border-gray-300"
             >
               <img src={images.cart_icon} alt="cart" className="w-3 h-3" />
-              Add to Cart
+              Thêm vào giỏ hàng
             </button>
           ) : (
             <div className="w-full flex items-center justify-between bg-gray-100 rounded-md p-0.5">

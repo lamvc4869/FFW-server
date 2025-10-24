@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
-import { images } from "../images";
+import NavBar from "../components/NavBar";
 import SellerAddProduct from "./SellerAddProduct";
 import SellerStoreControl from "./SellerStoreControl";
 import SellerOrders from "./SellerOrders";
 import toast from "react-hot-toast";
+import { MdAddCircleOutline, MdOutlineInventory2 } from "react-icons/md";
+import { BsBoxSeam } from "react-icons/bs";
 
 const SellerControl = () => {
   const navigate = useNavigate();
@@ -36,7 +38,6 @@ const SellerControl = () => {
       if (data.success) {
         setIsSeller(false);
         toast.success(data.message);
-        // localStorage.removeItem('accessToken');
         navigate("/seller/login");
       } else {
         toast.error(data.message);
@@ -44,9 +45,6 @@ const SellerControl = () => {
     } catch (error) {
       toast.error(error.message);
     }
-    // setIsSeller(false)
-    // localStorage.removeItem('isSeller')
-    // navigate('/seller/login')
   };
 
   const handleNavigation = (page, path) => {
@@ -55,34 +53,30 @@ const SellerControl = () => {
   };
 
   const sidebarLinks = [
-    { name: "Add Product", key: "add-product", path: "/seller" },
-    { name: "Product List", key: "products", path: "/seller/products" },
-    { name: "Orders", key: "orders", path: "/seller/orders" },
+    {
+      name: "Thêm sản phẩm",
+      key: "add-product",
+      path: "/seller",
+      icon: <MdAddCircleOutline className="w-5 h-5" />,
+    },
+    {
+      name: "Danh sách sản phẩm",
+      key: "products",
+      path: "/seller/products",
+      icon: <MdOutlineInventory2 className="w-5 h-5" />,
+    },
+    {
+      name: "Đơn hàng",
+      key: "orders",
+      path: "/seller/orders",
+      icon: <BsBoxSeam className="w-5 h-5" />,
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-8 border-b border-gray-200 py-4 bg-white shadow-sm">
-        <div className="flex items-center gap-3">
-          <img
-            src={images.logoFruitHub3D}
-            alt="GreenCart"
-            className="h-12 w-auto object-contain drop-shadow-sm"
-          />
-        </div>
-        <div className="flex items-center gap-4 text-gray-600">
-          <p className="text-sm">
-            Hi! <span className="font-medium">{user?.name || "Admin"}</span>
-          </p>
-          <button
-            onClick={handleLogout}
-            className="border border-gray-300 rounded-full text-sm px-5 py-1.5 hover:bg-gray-100 transition-colors font-medium"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+      {/* NavBar chung */}
+      <NavBar />
 
       {/* Main Content */}
       <div className="flex">
@@ -99,7 +93,10 @@ const SellerControl = () => {
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                {item.name}
+                <div className="flex items-center gap-3">
+                  <span className="text-current">{item.icon}</span>
+                  <span>{item.name}</span>
+                </div>
               </button>
             ))}
           </div>

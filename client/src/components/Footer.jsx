@@ -4,33 +4,33 @@ import { images } from "../images";
 const Footer = () => {
   const linkSections = [
     {
-      title: "Quick Links",
+      title: "Liên kết",
       links: [
-        { name: "Home", href: "/" },
-        { name: "Best Sellers", href: "/bestsellers" },
-        { name: "Categories", href: "/categories" },
-        { name: "Offers & Deals", href: "/offers" },
-        { name: "About Us", href: "/about" },
+        { name: "Trang chủ", href: "/" },
+        { name: "Sản phẩm bán chạy", href: "/bestsellers" },
+        { name: "Danh mục", href: "/categories" },
+        { name: "Ưu đãi & Giảm giá", href: "/offers" },
+        { name: "Về chúng tôi", href: "/about" },
       ],
     },
     {
-      title: "Customer Support",
+      title: "Hỗ trợ khách hàng",
       links: [
-        { name: "Delivery Information", href: "/delivery" },
-        { name: "Return & Refund Policy", href: "/returns" },
-        { name: "Payment Methods", href: "/payment" },
-        { name: "Track Your Order", href: "/track" },
-        { name: "Contact Us", href: "/contact" },
+        { name: "Thông tin giao hàng", href: "/delivery" },
+        { name: "Chính sách đổi trả & hoàn tiền", href: "/returns" },
+        { name: "Phương thức thanh toán", href: "/payment" },
+        { name: "Theo dõi đơn hàng", href: "/track" },
+        { name: "Liên hệ", href: "/contact" },
       ],
     },
     {
-      title: "Connect",
+      title: "Kết nối",
       links: [
-        { name: "Newsletter", href: "#newsletter" },
-        { name: "FAQs", href: "/faq" },
+        { name: "Bản tin", href: "#newsletter" },
+        { name: "Câu hỏi thường gặp", href: "/faq" },
         { name: "Blog", href: "/blog" },
-        { name: "Careers", href: "/careers" },
-        { name: "Press", href: "/press" },
+        { name: "Tuyển dụng", href: "/careers" },
+        { name: "Báo chí", href: "/press" },
       ],
     },
   ];
@@ -72,7 +72,6 @@ const Footer = () => {
 
   return (
     <footer className="bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden border-t border-gray-200/50">
-      {/* Background Pattern */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-green-500/5 to-transparent"></div>
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-green-500/5 rounded-full"></div>
@@ -94,23 +93,21 @@ const Footer = () => {
                 </span>
               </div>
               <p className="text-gray-700 leading-relaxed mb-8 max-w-md text-lg">
-                We deliver fresh groceries and snacks straight to your door.
-                Trusted by thousands, we aim to make your shopping experience
-                simple and affordable.
+                Chúng tôi giao tận nơi trái cây và thực phẩm tươi mỗi ngày.  
+                Được hàng nghìn khách hàng tin tưởng, FruitHub mong muốn mang đến cho bạn trải nghiệm mua sắm đơn giản, nhanh chóng và tiết kiệm nhất.
               </p>
 
               {/* Social Links */}
               <div className="flex items-center gap-4">
-                <span className="text-gray-700 font-medium">Follow Us:</span>
+                <span className="text-gray-700 font-medium">Theo dõi chúng tôi:</span>
                 <div className="flex items-center gap-3">
                   {socialLinks.map((social, index) => {
                     const hoverColors = [
-                      "hover:bg-pink-500 hover:shadow-pink-500/25 hover:text-white", // Instagram
-                      "hover:bg-blue-600 hover:shadow-blue-600/25 hover:text-white", // Facebook
-                      "hover:bg-sky-500 hover:shadow-sky-500/25 hover:text-white", // Twitter
-                      "hover:bg-red-600 hover:shadow-red-600/25 hover:text-white", // YouTube
+                      "hover:bg-pink-500 hover:shadow-pink-500/25 hover:text-white",
+                      "hover:bg-blue-600 hover:shadow-blue-600/25 hover:text-white",
+                      "hover:bg-sky-500 hover:shadow-sky-500/25 hover:text-white",
+                      "hover:bg-red-600 hover:shadow-red-600/25 hover:text-white",
                     ];
-
                     return (
                       <a
                         key={index}

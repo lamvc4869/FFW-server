@@ -79,7 +79,7 @@ const Login = () => {
             d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
-        Back to Home
+        Quay về trang chủ
       </Link>
 
       <div className="relative z-10 w-full max-w-md">
@@ -96,7 +96,7 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             <div className="px-8 pt-4 pb-2 text-center border-b border-gray-100">
               <h1 className="text-gray-800 text-3xl font-bold tracking-tight">
-                {state === "login" ? "Login Form" : "Sign Up Form"}
+                {state === "login" ? "Đăng Nhập" : "Đăng Ký"}
               </h1>
             </div>
 
@@ -110,7 +110,7 @@ const Login = () => {
                     <input
                       type="text"
                       name="firstName"
-                      placeholder="Enter your first name"
+                      placeholder="Nhập tên của bạn"
                       className="w-full mb-3 pl-3 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-gray-700 text-sm"
                       value={formData.firstName}
                       onChange={handleChange}
@@ -124,7 +124,7 @@ const Login = () => {
                     <input
                       type="text"
                       name="lastName"
-                      placeholder="Enter your last name"
+                      placeholder="Nhập họ của bạn"
                       className="w-full pl-3 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-gray-700 text-sm"
                       value={formData.lastName}
                       onChange={handleChange}
@@ -136,12 +136,12 @@ const Login = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 text-left">
-                  Email Address
+                  Địa chỉ Email
                 </label>
                 <input
                   type="email"
                   name="email"
-                  placeholder="Enter your email"
+                  placeholder="Nhập địa chỉ email của bạn"
                   className="w-full pl-3 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-gray-700 text-sm"
                   value={formData.email}
                   onChange={handleChange}
@@ -151,12 +151,12 @@ const Login = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2 text-left">
-                  Password
+                  Mật khẩu
                 </label>
                 <input
                   type="password"
                   name="password"
-                  placeholder="Enter your password"
+                  placeholder="Nhập mật khẩu của bạn"
                   className="w-full pl-3 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-gray-700 text-sm"
                   value={formData.password}
                   onChange={handleChange}
@@ -168,14 +168,14 @@ const Login = () => {
                 type="submit"
                 className="w-full py-3 bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold rounded-xl hover:scale-[1.02] hover:shadow-lg transition-all duration-300"
               >
-                {state === "login" ? "Sign In" : "Create Account"}
+                {state === "login" ? "Đăng Nhập" : "Đăng Ký"}
               </button>
 
               <div className="text-center pt-4 border-t border-gray-200">
                 <p className="text-gray-600 text-sm mb-2">
                   {state === "login"
-                    ? "New to FruitHub?"
-                    : "Already have an account?"}
+                    ? "Mới đến FruitHub?"
+                    : "Đã có tài khoản?"}
                 </p>
                 <button
                   type="button"
@@ -186,7 +186,7 @@ const Login = () => {
                   }
                   className="text-green-600 hover:text-green-700 font-semibold transition-all duration-300"
                 >
-                  {state === "login" ? "Create Account" : "Sign In Instead"}
+                  {state === "login" ? "Tạo tài khoản" : "Đăng Nhập"}
                 </button>
               </div>
             </div>

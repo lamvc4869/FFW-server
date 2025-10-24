@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { FaStore } from "react-icons/fa";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { images } from "../images";
+import { useAppContext } from "../context/AppContext";
 
 const NavBar = () => {
-  const [user, setUser] = useState(() => {
-    const u = localStorage.getItem("user");
-    return u ? JSON.parse(u) : null;
-  });
+  const location = useLocation();
+  const { user, logout: contextLogout } = useAppContext();
   const [open, setOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [cartItems, setCartItems] = useState(() => {
@@ -17,23 +17,11 @@ const NavBar = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
-  // Cập nhật user on storage change (khi login page khác xong lên navbar)
-  useEffect(() => {
-    const onStorage = () => {
-      const u = localStorage.getItem("user");
-      setUser(u ? JSON.parse(u) : null);
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
-  // Hàm login/local update khi đăng nhập thành công gọi window.dispatchEvent(new Event('storage')) hoặc reload.
+  // Hàm logout - gọi từ context
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
-    setUser(null);
+    contextLogout();
     setShowDropdown(false);
-    // Có thể reload hoặc điều hướng nếu cần
+    navigate("/");
   };
 
   useEffect(() => {
@@ -89,7 +77,7 @@ const NavBar = () => {
                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                   />
                 </svg>
-                Home
+                Trang chủ
               </span>
               {/* Bottom line indicator */}
               <div
@@ -123,7 +111,7 @@ const NavBar = () => {
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                   />
                 </svg>
-                All Products
+                Tất cả sản phẩm
               </span>
               {/* Bottom line indicator */}
               <div
@@ -157,7 +145,7 @@ const NavBar = () => {
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                About
+                Về chúng tôi
               </span>
               {/* Bottom line indicator */}
               <div
@@ -189,7 +177,7 @@ const NavBar = () => {
           </svg>
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Tìm kiếm sản phẩm..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="outline-none bg-transparent placeholder-gray-400 flex-1 min-w-[200px] font-medium"
@@ -221,24 +209,50 @@ const NavBar = () => {
           )}
         </form>
 
-        {/* Cart */}
-        <div
-          className="relative cursor-pointer group"
-          onClick={() => navigate("/cart")}
-        >
-          <div className="p-2 rounded-full hover:bg-gray-50 transition-all duration-300 hover:scale-110">
-            <img
-              src={images.nav_cart_icon}
-              alt="cart"
-              className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
-            />
-            {Object.keys(cartItems).length > 0 && (
-              <div className="absolute -top-1 -right-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse font-semibold">
-                {Object.keys(cartItems).length}
-              </div>
+        {/* Nếu là admin thì hiện link Seller, ẩn giỏ hàng */}
+        {user?.role === "admin" ? (
+          <NavLink
+            to="/seller"
+            className="relative font-medium transition-all duration-300 px-4 py-3 group tracking-tight text-gray-700 hover:text-green-700 hover:font-bold hover:bg-gray-50"
+          >
+            {({ isActive }) => (
+              <>
+                <span
+                  className={`relative z-10 flex items-center gap-2 ${isActive ? "text-green-700 font-bold" : ""}`}
+                >
+                  <FaStore className="w-4 h-4 transition-all duration-300" />
+                  Cửa hàng
+                </span>
+                {/* Bottom line indicator */}
+                <div
+                  className={`absolute bottom-0 left-0 right-0 h-0.5 bg-green-600 transition-all duration-300 ${
+                    isActive
+                      ? "opacity-100"
+                      : "opacity-0 group-hover:opacity-100"
+                  }`}
+                ></div>
+              </>
             )}
+          </NavLink>
+        ) : (
+          <div
+            className="relative cursor-pointer group"
+            onClick={() => navigate("/cart")}
+          >
+            <div className="p-2 rounded-full hover:bg-gray-50 transition-all duration-300 hover:scale-110">
+              <img
+                src={images.nav_cart_icon}
+                alt="cart"
+                className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
+              />
+              {Object.keys(cartItems).length > 0 && (
+                <div className="absolute -top-1 -right-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse font-semibold">
+                  {Object.keys(cartItems).length}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* User Profile */}
         <div className="relative" ref={dropdownRef}>
@@ -250,7 +264,7 @@ const NavBar = () => {
               >
                 <div className="w-9 h-9 rounded-full overflow-hidden shadow-md group-hover:shadow-lg transition-shadow border border-green-200/80 group-hover:border-green-300">
                   <img
-                    src={images.profile_icon}
+                    src={user?.avatar || images.profile_icon}
                     alt="Profile"
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
@@ -277,14 +291,14 @@ const NavBar = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full overflow-hidden shadow-md border border-green-200/80">
                         <img
-                          src={images.profile_icon}
+                          src={user?.avatar || images.profile_icon}
                           alt="Profile"
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold text-gray-800 truncate tracking-tight">
-                          {user.name}
+                          {user.firstName} {user.lastName}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
                           {user.email}
@@ -317,33 +331,37 @@ const NavBar = () => {
                         />
                       </svg>
                       <span className="text-sm tracking-tight">
-                        View Profile
+                        Hồ sơ cá nhân
                       </span>
                     </button>
 
                     {/* Orders */}
-                    <button
-                      onClick={() => {
-                        navigate("/orders");
-                        setShowDropdown(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200 group"
-                    >
-                      <svg
-                        className="w-4 h-4 text-gray-500 group-hover:text-green-600 transition-colors"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    {user?.role !== "admin" && (
+                      <button
+                        onClick={() => {
+                          navigate("/orders");
+                          setShowDropdown(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200 group"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                        />
-                      </svg>
-                      <span className="text-sm tracking-tight">My Orders</span>
-                    </button>
+                        <svg
+                          className="w-4 h-4 text-gray-500 group-hover:text-green-600 transition-colors"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                          />
+                        </svg>
+                        <span className="text-sm tracking-tight">
+                          Đơn hàng của tôi
+                        </span>
+                      </button>
+                    )}
 
                     {/* Settings */}
                     <button
@@ -372,7 +390,7 @@ const NavBar = () => {
                           d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
-                      <span className="text-sm tracking-tight">Settings</span>
+                      <span className="text-sm tracking-tight">Cài đặt</span>
                     </button>
 
                     {/* Help & Support */}
@@ -397,7 +415,7 @@ const NavBar = () => {
                         />
                       </svg>
                       <span className="text-sm tracking-tight">
-                        Help & Support
+                        Trợ giúp & Hỗ trợ
                       </span>
                     </button>
 
@@ -422,7 +440,7 @@ const NavBar = () => {
                           d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                         />
                       </svg>
-                      <span className="text-sm tracking-tight">Logout</span>
+                      <span className="text-sm tracking-tight">Đăng xuất</span>
                     </button>
                   </div>
                 </div>
@@ -452,7 +470,7 @@ const NavBar = () => {
                     d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
                   />
                 </svg>
-                Login
+                Đăng nhập
               </span>
             </button>
           )}

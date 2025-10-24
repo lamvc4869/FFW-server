@@ -10,10 +10,11 @@ import { connectCloudinary } from "./src/utils/cloudinary.js";
 
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT;
+const PORT_BE = process.env.PORT_BE;
+const PORT_FE = process.env.PORT_FE;
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: `http://localhost:${PORT_FE}`,
   credentials: true,
 };
 
@@ -27,7 +28,7 @@ app.use(CART_API, cartRoute);
 Promise.all([connectDB(), connectCloudinary()])
   .then(() => {
     console.log("Connected to database and Cloudinary");
-    app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+    app.listen(PORT_BE, () => console.log(`Server is running on port ${PORT_BE}`));
   })
   .catch((err) => {
     console.error("Startup failed:", err?.message || err);

@@ -15,8 +15,11 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const navigate = useNavigate();
-  // User starts as null (not logged in) - only set after successful login
-  const [user, setUser] = useState(null);
+  // User - khởi tạo từ localStorage nếu có
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser && savedUser !== "null" ? JSON.parse(savedUser) : null;
+  });
   const [isSeller, setIsSeller] = useState(() => {
     return localStorage.getItem("isSeller") === "true";
   });
@@ -92,6 +95,15 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem("isSeller", isSeller);
   }, [isSeller]);
+
+  // Save user to localStorage whenever it changes (hoặc xóa nếu null)
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   // Save addresses to localStorage whenever it changes
   useEffect(() => {

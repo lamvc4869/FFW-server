@@ -59,13 +59,13 @@ const SellerOrders = () => {
 
     return (
         <div className="py-8 px-6 md:px-12 bg-white min-h-[calc(100vh-73px)]">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8">Orders List</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-8">Đơn hàng</h2>
 
             {orders.length === 0 ? (
                 <div className="text-center py-16 bg-gray-50 rounded-xl">
                     <div className="text-6xl mb-4">📦</div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No orders yet</h3>
-                    <p className="text-gray-500">Orders from customers will appear here</p>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Chưa có đơn hàng nào</h3>
+                    <p className="text-gray-500">Đơn hàng từ khách hàng sẽ xuất hiện ở đây</p>
                 </div>
             ) : (
                 <div className="space-y-6">

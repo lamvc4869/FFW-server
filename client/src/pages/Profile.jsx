@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { images } from "../images";
+import { useAppContext } from "../context/AppContext";
 import axios from "axios";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(() => {
-    const u = localStorage.getItem("user");
-    return u ? JSON.parse(u) : null;
-  });
+  const { user, setUser, logout } = useAppContext();
   const [orders, setOrders] = useState(() => {
     const o = localStorage.getItem("orders");
     return o ? JSON.parse(o) : [];
@@ -17,16 +15,10 @@ const Profile = () => {
   const [loadingUser, setLoadingUser] = useState(false);
 
   // Hàm logout đơn giản
-  const logout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    // Có thể clear thêm thông tin cần thiết nếu muốn
-    setUser(null);
-    // Điều hướng nếu cần
-  };
+  // logout đã lấy từ context, không cần định nghĩa lại
 
   // Calculate real stats from orders - Memoized để tránh recalculate mỗi render
-  const orderStats = useState(() => {
+  const orderStats = useMemo(() => {
     const totalOrders = orders.length;
     const processingOrders = orders.filter(
       (o) => o.status === "Processing"
@@ -59,7 +51,7 @@ const Profile = () => {
     totalPoints,
   } = orderStats;
   // Get recent orders (latest 5) - Memoized
-  const recentOrders = useState(() => {
+  const recentOrders = useMemo(() => {
     return orders.slice(0, 5).map((order) => ({
       id: order.id,
       date: new Date(order.date).toLocaleDateString("vi-VN"),
@@ -116,7 +108,7 @@ const Profile = () => {
   ];
 
   // Get recent activities from orders - Memoized
-  const recentActivities = useState(() => {
+  const recentActivities = useMemo(() => {
     return orders.slice(0, 4).map((order) => {
       if (order.status === "Processing") {
         return {
@@ -161,7 +153,7 @@ const Profile = () => {
   }, [orders]);
 
   // Achievements calculation - Memoized
-  const achievements = useState(
+  const achievements = useMemo(
     () => [
       {
         emoji: "🌟",
@@ -225,7 +217,7 @@ const Profile = () => {
     fetchUser();
     // eslint-disable-next-line
   }, []);
-
+  
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50/30 flex items-center justify-center p-4">
@@ -287,7 +279,8 @@ const Profile = () => {
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-white to-green-100 p-1 shadow-2xl group-hover:scale-105 transition-transform duration-300">
                 <img
                   className="w-full h-full rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white text-4xl md:text-5xl font-bold shadow-inner"
-                  src={user.avatar}
+                  src={user?.avatar || "/default-avatar.png"}
+                  alt={`${user?.firstName || "User"}'s avatar`}
                 />
               </div>
               <button className="absolute bottom-0 right-0 w-10 h-10 bg-white text-green-600 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center">
