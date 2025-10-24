@@ -97,8 +97,6 @@ const Settings = () => {
   const tabs = [
     { id: "account", name: "Tài khoản", icon: "👤" },
     { id: "address", name: "Địa chỉ", icon: "📍" },
-    { id: "notifications", name: "Thông báo", icon: "🔔" },
-    { id: "privacy", name: "Bảo mật", icon: "🔒" },
     { id: "password", name: "Đổi mật khẩu", icon: "🔑" },
   ];
 
