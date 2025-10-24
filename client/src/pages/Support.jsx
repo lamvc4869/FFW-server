@@ -169,7 +169,7 @@ const Support = () => {
 
                 <div className="relative max-w-7xl mx-auto px-4 py-16 text-center">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-                        Chúng tôi ở đây để giúp bạn 👋
+                        Chúng tôi ở đây để giúp bạn
                     </h1>
                     <p className="text-lg md:text-xl text-green-50 max-w-2xl mx-auto mb-8">
                         Tìm câu trả lời nhanh chóng hoặc liên hệ với đội ngũ hỗ trợ nhiệt tình của chúng tôi

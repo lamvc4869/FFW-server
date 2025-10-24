@@ -9,6 +9,7 @@ import { upload } from "../utils/multer.js";
 import updateUserController from "../controllers/sharedControllers/updateUser.controller.js";
 import { verifyUserOrAdmin } from "../middlewares/verifyRole.middleware.js";
 import getUserByIdController from "../controllers/sharedControllers/getUserById.controller.js";
+import getProductByIdController from "../controllers/sharedControllers/getProductById.controller.js";
 
 const router = express.Router();
 
@@ -25,5 +26,6 @@ router.patch(
   updateUserController
 );
 router.get("/user/:userId", verifyToken, getUserByIdController);
+router.get('/product/:productId', getProductByIdController);
 
 export default router;

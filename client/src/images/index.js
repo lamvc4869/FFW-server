@@ -64,23 +64,23 @@ export const images = {
 export const features = [
   {
     icon: delivery_truck_icon,
-    title: "Fastest Delivery",
-    description: "Groceries delivered in under 30 minutes.",
+    title: "Giao hàng nhanh chóng",
+    description: "Thực phẩm được giao trong vòng 30 phút.",
   },
   {
     icon: leaf_icon,
-    title: "Freshness Guaranteed",
-    description: "Fresh produce straight from the source.",
+    title: "Đảm bảo độ tươi ngon",
+    description: "Sản phẩm tươi ngon được cung cấp trực tiếp từ nguồn uy tín.",
   },
   {
     icon: coin_icon,
-    title: "Affordable Prices",
-    description: "Quality groceries at unbeatable prices.",
+    title: "Giá cả phải chăng",
+    description: "Thực phẩm chất lượng với giá cả không thể tốt hơn.",
   },
   {
     icon: trust_icon,
-    title: "Trusted by Thousands",
-    description: "Loved by 10,000+ happy customers.",
+    title: "Được hàng triệu người tin tưởng",
+    description: "Yêu thích bởi hơn 10,000 khách hàng hài lòng.",
   },
 ];
 
@@ -134,51 +134,54 @@ export const dummyAddress = [
 
 export const categories = [
   {
-    text: "Vietnamese Fruits",
-    path: "Vietnamese-Fruits",
-    image: null, // Will use placeholder or remove image dependency
+    text: "Trái cây",
+    path: "fruits",
+    image:
+      "https://res.cloudinary.com/dki6kmnto/image/upload/v1761194843/categories_imported_fruit_otexcg.png",
     bgColor: "#FEF4E6",
-    icon: "🇻🇳",
-    description:
-      "Fresh local fruits: Mango, Dragon Fruit, Pomelo, Milk Fruit...",
-    scale: 0.85,
+    icon: "🍊",
+    description: "Trái cây tươi ngon địa phương và nhập khẩu...",
+    scale: 1.3,
   },
   {
-    text: "Imported Fruits",
-    path: "Imported-Fruits",
-    image: null, // Will use placeholder or remove image dependency
+    text: "Rau củ",
+    path: "vegetables",
+    image:
+      "https://res.cloudinary.com/dki6kmnto/image/upload/v1761194836/organic_vegitable_image_kpw7xc.png", // Will use placeholder or remove image dependency
     bgColor: "#E8F4FD",
-    icon: "🌏",
-    description:
-      "Premium imports: US Apples, Australian Grapes, Chilean Cherry...",
+    icon: "🥦",
+    description: "Rau củ hữu cơ, lá xanh và các loại rau tươi khác...",
+    scale: 1.3,
+  },
+  {
+    text: "Nước uống",
+    path: "drinks",
+    image:
+      "https://res.cloudinary.com/dki6kmnto/image/upload/v1761194923/bottles_image_vegis0.png", // Will use placeholder or remove image dependency
+    bgColor: "#FFF0F5",
+    icon: "🥭",
+    description: "Đang cập nhật...",
     scale: 1.2,
   },
   {
-    text: "Dried & Processed",
-    path: "Processed-Fruits",
-    image: null, // Will use placeholder or remove image dependency
-    bgColor: "#FFF0F5",
-    icon: "🥭",
-    description: "Dried fruits, jams, canned juices & healthy snacks",
-    scale: 0.9,
-  },
-  {
-    text: "Gift Baskets",
-    path: "Gift-Baskets",
-    image: null, // Will use placeholder or remove image dependency
+    text: "Giỏ quà",
+    path: "gifts",
+    image:
+      "https://res.cloudinary.com/dki6kmnto/image/upload/v1761194680/categories_gifted_basket_fxh3hi.png", // Will use placeholder or remove image dependency
     bgColor: "#F0F8F5",
     icon: "🎁",
-    description: "Elegant gift sets perfect for any special occasion",
-    scale: 1.1,
+    description: "Đang cập nhật...",
+    scale: 1.2,
   },
   {
-    text: "Fresh Juices",
-    path: "Fresh-Juices",
-    image: null, // Will use placeholder or remove image dependency
-    bgColor: "#FFF8E8",
-    icon: "🧃",
-    description: "Fresh juices, smoothies & healthy fruit beverages",
-    scale: 0.85,
+    text: "Lương thực",
+    path: "groceries",
+    image:
+      "https://res.cloudinary.com/dki6kmnto/image/upload/v1761195063/grain_image_vzvkrj.png", // Will use placeholder or remove image dependency
+    bgColor: "#FFF8E7",
+    icon: "🍞",
+    description: "Đang cập nhật...",
+    scale: 1.2,
   },
 ];
 

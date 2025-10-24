@@ -30,9 +30,9 @@ function Home() {
       </div>
 
       {/* Newsletter Section */}
-      <div className="-mt-8">
+      {/* <div className="-mt-8">
         <Newsletter />
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -5,53 +5,53 @@ function About() {
   const { user } = useAppContext();
 
   const stats = [
-    { number: "50K+", label: "Happy Customers" },
-    { number: "100+", label: "Premium Products" },
-    { number: "24/7", label: "Customer Support" },
-    { number: "5★", label: "Average Rating" },
+    { number: "50K+", label: "Khách hàng hài lòng" },
+    { number: "100+", label: "Sản phẩm cao cấp" },
+    { number: "24/7", label: "Hỗ trợ khách hàng" },
+    { number: "5★", label: "Đánh giá trung bình" },
   ];
 
   const values = [
     {
       emoji: "🍎",
-      title: "Premium Quality",
+      title: "Chất lượng hàng đầu",
       description:
-        "Every fruit is hand-picked and inspected to ensure you receive only the best quality produce",
+        "Mỗi loại trái cây đều được chọn lọc kỹ lưỡng để đảm bảo bạn nhận được sản phẩm tươi ngon nhất.",
       gradient: "from-red-50 to-pink-50",
     },
     {
       emoji: "🚚",
-      title: "Fast Delivery",
+      title: "Giao hàng nhanh chóng",
       description:
-        "Fresh from farm to your table within 24 hours, maintaining maximum freshness and nutrition",
+        "Từ nông trại đến bàn ăn của bạn trong vòng 24 giờ, giữ trọn độ tươi ngon và dinh dưỡng.",
       gradient: "from-blue-50 to-cyan-50",
     },
     {
       emoji: "🌱",
-      title: "Sustainable",
+      title: "Phát triển bền vững",
       description:
-        "Supporting eco-friendly farming practices and reducing our environmental footprint",
+        "Hỗ trợ canh tác thân thiện với môi trường và giảm thiểu tác động sinh thái.",
       gradient: "from-green-50 to-emerald-50",
     },
     {
       emoji: "💚",
-      title: "Customer First",
+      title: "Khách hàng là ưu tiên hàng đầu",
       description:
-        "Your satisfaction is our priority—we're here to make your fruit shopping experience delightful",
+        "Sự hài lòng của bạn là mục tiêu của chúng tôi — mang đến trải nghiệm mua sắm trái cây tuyệt vời nhất.",
       gradient: "from-emerald-50 to-teal-50",
     },
     {
       emoji: "🌏",
-      title: "Wide Selection",
+      title: "Đa dạng lựa chọn",
       description:
-        "From local Vietnamese fruits to exotic imports, discover a world of flavors in one place",
+        "Từ trái cây Việt Nam đến các loại nhập khẩu cao cấp — tất cả đều có tại một nơi.",
       gradient: "from-violet-50 to-purple-50",
     },
     {
       emoji: "✨",
-      title: "Always Fresh",
+      title: "Luôn tươi mới",
       description:
-        "We guarantee freshness with daily deliveries and a commitment to quality you can taste",
+        "Chúng tôi đảm bảo trái cây luôn tươi mỗi ngày với cam kết chất lượng bạn có thể cảm nhận được.",
       gradient: "from-yellow-50 to-orange-50",
     },
   ];
@@ -67,15 +67,14 @@ function About() {
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6 leading-tight">
-              Bringing Nature's Best
+              Mang tinh túy thiên nhiên
               <br />
               <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                To Your Doorstep
+                Đến tận cửa nhà bạn
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              More than just a fruit store—we're your partner in living a
-              healthier, happier life through fresh, premium quality fruits
+              Không chỉ là một cửa hàng trái cây — chúng tôi đồng hành cùng bạn trong hành trình sống khỏe mạnh và hạnh phúc hơn với trái cây tươi ngon, chất lượng cao.
             </p>
           </div>
 
@@ -83,11 +82,11 @@ function About() {
           {user && (
             <div className="bg-white/80 backdrop-blur-sm border border-green-200 rounded-2xl p-6 mb-8 text-center shadow-lg max-w-2xl mx-auto">
               <p className="text-lg text-gray-700">
-                👋 Welcome back,{" "}
+                👋 Chào mừng trở lại,{" "}
                 <span className="font-bold text-green-600">{user.name}</span>!
                 <br />
                 <span className="text-sm text-gray-600">
-                  Thank you for being part of our family
+                  Cảm ơn bạn đã là một phần của gia đình chúng tôi
                 </span>
               </p>
             </div>
@@ -119,44 +118,37 @@ function About() {
             {/* Text Content */}
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-                Our Story
+                Câu chuyện của chúng tôi
               </h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  Founded with a simple belief:{" "}
+                  Được thành lập với niềm tin đơn giản rằng{" "}
                   <span className="font-semibold text-gray-800">
-                    everyone deserves access to fresh, delicious fruits
+                    mọi người đều xứng đáng được thưởng thức trái cây tươi ngon và bổ dưỡng
                   </span>
-                  . What started as a small passion project has blossomed into a
-                  thriving online marketplace serving thousands of satisfied
-                  customers.
+                  . Từ một dự án nhỏ xuất phát từ đam mê, chúng tôi đã phát triển thành một nền tảng thương mại điện tử phục vụ hàng ngàn khách hàng trên khắp cả nước.
                 </p>
                 <p>
-                  We work directly with trusted farmers and suppliers across
-                  Vietnam and around the world, ensuring every piece of fruit
-                  meets our rigorous quality standards. From the lush orchards
-                  of the Mekong Delta to exotic farms abroad, we bring you{" "}
+                  Chúng tôi hợp tác trực tiếp với các nông trại và nhà cung cấp uy tín trong và ngoài nước, đảm bảo mỗi quả đều đạt tiêu chuẩn chất lượng nghiêm ngặt.  
+                  Từ những vườn cây xanh mướt ở đồng bằng sông Cửu Long đến các trang trại nhập khẩu, chúng tôi mang đến cho bạn{" "}
                   <span className="font-semibold text-gray-800">
-                    nature's finest selections
+                    tinh hoa của thiên nhiên
                   </span>
                   .
                 </p>
                 <p>
-                  Our mission goes beyond selling fruits. We're building a
-                  community of health-conscious individuals who believe in the
-                  power of fresh, nutritious food. Every order supports
-                  sustainable farming practices and helps create a healthier
-                  future for all.
+                  Sứ mệnh của chúng tôi không chỉ là bán trái cây — mà còn là xây dựng cộng đồng những người yêu thích lối sống lành mạnh.  
+                  Mỗi đơn hàng của bạn góp phần thúc đẩy nông nghiệp bền vững và tạo dựng một tương lai khỏe mạnh hơn cho tất cả mọi người.
                 </p>
               </div>
 
               {/* Call to Action */}
               <div className="mt-8 flex flex-wrap gap-4">
                 <button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                  Shop Now
+                  Mua ngay
                 </button>
                 <button className="bg-white border-2 border-gray-200 hover:border-green-500 text-gray-800 px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-md">
-                  Learn More
+                  Tìm hiểu thêm
                 </button>
               </div>
             </div>
@@ -189,11 +181,10 @@ function About() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              Why Choose Us
+              Vì sao nên chọn chúng tôi?
             </h2>
             <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
-              We're committed to delivering excellence in every aspect of our
-              service
+              Chúng tôi cam kết mang đến sự xuất sắc trong từng khía cạnh của dịch vụ
             </p>
           </div>
 
@@ -225,25 +216,23 @@ function About() {
       {/* Mission Section */}
       <div className="py-16 px-6 md:px-16 lg:px-24 bg-gradient-to-r from-green-600 to-emerald-600">
         <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Mission</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Sứ mệnh của chúng tôi</h2>
           <p className="text-lg md:text-xl leading-relaxed opacity-95 mb-8">
-            To revolutionize the way people experience fresh fruits by making
-            premium quality accessible to everyone while championing sustainable
-            farming practices and supporting local communities. Together, we're
-            building a healthier, happier world—one fruit at a time.
+            Chúng tôi mong muốn thay đổi cách mọi người trải nghiệm trái cây — mang chất lượng cao cấp đến với mọi nhà, đồng thời ủng hộ nông nghiệp bền vững và cộng đồng địa phương.  
+            Cùng nhau, chúng ta xây dựng một thế giới khỏe mạnh và hạnh phúc hơn — từng quả trái cây một.
           </p>
           <div className="flex flex-wrap justify-center gap-8 text-sm font-medium">
             <div className="flex items-center gap-2">
               <span className="text-2xl">🌍</span>
-              <span>Sustainable Practices</span>
+              <span>Canh tác bền vững</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-2xl">🤝</span>
-              <span>Supporting Farmers</span>
+              <span>Hỗ trợ nông dân</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-2xl">💪</span>
-              <span>Healthier Communities</span>
+              <span>Cộng đồng khỏe mạnh</span>
             </div>
           </div>
         </div>
@@ -253,30 +242,29 @@ function About() {
       <div className="py-16 px-6 md:px-16 lg:px-24 bg-white">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            Trusted by Thousands
+            Được tin tưởng bởi hàng ngàn khách hàng
           </h2>
           <p className="text-gray-600 mb-12 max-w-2xl mx-auto">
-            Join our growing community of satisfied customers who've made the
-            switch to fresher, healthier living
+            Hãy cùng tham gia cộng đồng những khách hàng đã lựa chọn lối sống tươi mới và lành mạnh hơn
           </p>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 quote:
-                  "The freshest fruits I've ever ordered online! Delivery is always on time and the quality is unmatched.",
+                  "Trái cây tươi nhất mà tôi từng đặt online! Giao hàng luôn đúng hẹn và chất lượng tuyệt vời.",
                 author: "Nguyễn Thu Hà",
                 location: "Hà Nội",
               },
               {
                 quote:
-                  "Amazing selection of both local and imported fruits. Customer service is excellent and very responsive.",
+                  "Rất nhiều lựa chọn từ trái cây Việt đến nhập khẩu. Dịch vụ chăm sóc khách hàng cực kỳ chu đáo.",
                 author: "Trần Minh Khôi",
                 location: "TP. Hồ Chí Minh",
               },
               {
                 quote:
-                  "Love that they support sustainable farming! The fruits taste better knowing they're ethically sourced.",
+                  "Tôi thích việc họ ủng hộ nông nghiệp bền vững! Trái cây ngon hơn khi biết được nguồn gốc đáng tin cậy.",
                 author: "Lê Phương Anh",
                 location: "Đà Nẵng",
               },

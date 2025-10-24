@@ -36,7 +36,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/support" element={<Support />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/seller/login" element={<SellerLogin />} />
+        {/* <Route path="/seller/login" element={<SellerLogin />} /> */}
         <Route path="/seller" element={<SellerControl />} />
         <Route path="/seller/products" element={<SellerControl />} />
         <Route path="/seller/orders" element={<SellerControl />} />
