@@ -10,10 +10,10 @@ import Support from './pages/Support'
 import Profile from './pages/Profile'
 import Cart from './pages/Cart'
 import MyOrders from './pages/MyOrders'
-import SellerLogin from './pages/SellerLogin'
+import SearchProduct from './pages/SearchProduct'
 import SellerControl from './pages/SellerControl'
-import NavBar from './components/NavBar'
-import Footer from './components/Footer'
+import NavBar from './components/home/NavBar'
+import Footer from './components/home/Footer'
 
 function App() {
   const location = useLocation()
@@ -36,7 +36,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/support" element={<Support />} />
         <Route path="/login" element={<Login />} />
-        {/* <Route path="/seller/login" element={<SellerLogin />} /> */}
+        <Route path="/search" element={<SearchProduct />} />
         <Route path="/seller" element={<SellerControl />} />
         <Route path="/seller/products" element={<SellerControl />} />
         <Route path="/seller/orders" element={<SellerControl />} />

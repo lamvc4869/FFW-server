@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/home/NavBar";
 import SellerAddProduct from "./SellerAddProduct";
 import SellerStoreControl from "./SellerStoreControl";
 import SellerOrders from "./SellerOrders";

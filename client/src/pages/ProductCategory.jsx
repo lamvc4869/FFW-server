@@ -24,17 +24,7 @@ const ProductCategory = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          throw new Error("Vui lòng đăng nhập để xem sản phẩm");
-        }
-
-        const res = await axios.get("http://localhost:3000/api/v1/products", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+        const res = await axios.get("http://localhost:3000/api/v1/products");
         if (!res.data || !res.data.data) {
           throw new Error("Không thể tải dữ liệu sản phẩm");
         }
@@ -46,12 +36,6 @@ const ProductCategory = () => {
           "Không thể tải sản phẩm. Vui lòng thử lại.";
         setError(errorMessage);
         setProducts([]);
-
-        // Nếu token không hợp lệ, chuyển về trang login
-        if (err.response?.status === 401) {
-          localStorage.removeItem("accessToken");
-          navigate("/login");
-        }
       } finally {
         setLoading(false);
       }

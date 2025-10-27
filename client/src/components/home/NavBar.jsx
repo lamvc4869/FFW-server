@@ -1,21 +1,55 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaStore } from "react-icons/fa";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { images } from "../images";
-import { useAppContext } from "../context/AppContext";
+import { images } from "../../images";
+import { useAppContext } from "../../context/AppContext";
+import axios from "axios";
 
 const NavBar = () => {
   const location = useLocation();
-  const { user, logout: contextLogout } = useAppContext();
+  const { user, logout: contextLogout, cartRefreshTrigger } = useAppContext();
   const [open, setOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [cartItems, setCartItems] = useState(() => {
-    const c = localStorage.getItem("cart");
-    return c ? JSON.parse(c) : {};
-  });
+  const [cartItemCount, setCartItemCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+
+  // Fetch cart from API
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      if (!user) {
+        setCartItemCount(0);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
+        const response = await axios.get(
+          "http://localhost:3000/api/v1/cart/my-cart",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data.success && response.data.cart) {
+          setCartItemCount(response.data.cart.products?.length || 0);
+        }
+      } catch (error) {
+        // Cart không tồn tại hoặc lỗi - không cần hiển thị lỗi
+        if (error.response?.status !== 404) {
+          console.error("Error fetching cart:", error);
+        }
+        setCartItemCount(0);
+      }
+    };
+
+    fetchCartCount();
+  }, [user, cartRefreshTrigger]); // Thêm cartRefreshTrigger vào dependency
 
   // Hàm logout - gọi từ context
   const handleLogout = () => {
@@ -36,9 +70,10 @@ const NavBar = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate("/products");
-      // Keep search query to show results
+    const query = searchQuery.trim();
+    if (query) {
+      navigate(`/search?name=${encodeURIComponent(query)}`);
+      setSearchQuery("");
     }
   };
 
@@ -245,9 +280,9 @@ const NavBar = () => {
                 alt="cart"
                 className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
               />
-              {Object.keys(cartItems).length > 0 && (
+              {cartItemCount > 0 && (
                 <div className="absolute -top-1 -right-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse font-semibold">
-                  {Object.keys(cartItems).length}
+                  {cartItemCount}
                 </div>
               )}
             </div>
@@ -309,31 +344,33 @@ const NavBar = () => {
 
                   {/* Menu Items */}
                   <div className="py-2">
-                    {/* Profile */}
-                    <button
-                      onClick={() => {
-                        navigate("/profile");
-                        setShowDropdown(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200 group"
-                    >
-                      <svg
-                        className="w-4 h-4 text-gray-500 group-hover:text-green-600 transition-colors"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    {/* Profile - Chỉ hiện khi không phải admin */}
+                    {user?.role !== "admin" && (
+                      <button
+                        onClick={() => {
+                          navigate("/profile");
+                          setShowDropdown(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200 group"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
-                      <span className="text-sm tracking-tight">
-                        Hồ sơ cá nhân
-                      </span>
-                    </button>
+                        <svg
+                          className="w-4 h-4 text-gray-500 group-hover:text-green-600 transition-colors"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                        <span className="text-sm tracking-tight">
+                          Hồ sơ cá nhân
+                        </span>
+                      </button>
+                    )}
 
                     {/* Orders */}
                     {user?.role !== "admin" && (
@@ -393,31 +430,33 @@ const NavBar = () => {
                       <span className="text-sm tracking-tight">Cài đặt</span>
                     </button>
 
-                    {/* Help & Support */}
-                    <button
-                      onClick={() => {
-                        navigate("/support");
-                        setShowDropdown(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200 group"
-                    >
-                      <svg
-                        className="w-4 h-4 text-gray-500 group-hover:text-purple-600 transition-colors"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    {/* Help & Support - Ẩn với admin */}
+                    {user?.role !== "admin" && (
+                      <button
+                        onClick={() => {
+                          navigate("/support");
+                          setShowDropdown(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200 group"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <span className="text-sm tracking-tight">
-                        Trợ giúp & Hỗ trợ
-                      </span>
-                    </button>
+                        <svg
+                          className="w-4 h-4 text-gray-500 group-hover:text-purple-600 transition-colors"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <span className="text-sm tracking-tight">
+                          Trợ giúp & Hỗ trợ
+                        </span>
+                      </button>
+                    )}
 
                     {/* Divider */}
                     <div className="border-t border-gray-100 my-2"></div>
@@ -658,29 +697,31 @@ const NavBar = () => {
 
                 {/* Menu Items */}
                 <div className="space-y-1">
-                  {/* Profile */}
-                  <button
-                    onClick={() => {
-                      navigate("/profile");
-                      setOpen(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-all duration-300 group"
-                  >
-                    <svg
-                      className="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  {/* Profile - Chỉ hiện khi không phải admin */}
+                  {user?.role !== "admin" && (
+                    <button
+                      onClick={() => {
+                        navigate("/profile");
+                        setOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-all duration-300 group"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                    <span>View Profile</span>
-                  </button>
+                      <svg
+                        className="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-colors"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                      <span>View Profile</span>
+                    </button>
+                  )}
 
                   {/* Orders */}
                   <button
@@ -736,29 +777,31 @@ const NavBar = () => {
                     <span>Settings</span>
                   </button>
 
-                  {/* Help & Support */}
-                  <button
-                    onClick={() => {
-                      navigate("/support");
-                      setOpen(false);
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-all duration-300 group"
-                  >
-                    <svg
-                      className="w-5 h-5 text-gray-500 group-hover:text-purple-600 transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  {/* Help & Support - Ẩn với admin */}
+                  {user?.role !== "admin" && (
+                    <button
+                      onClick={() => {
+                        navigate("/support");
+                        setOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-all duration-300 group"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span>Help & Support</span>
-                  </button>
+                      <svg
+                        className="w-5 h-5 text-gray-500 group-hover:text-purple-600 transition-colors"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>Help & Support</span>
+                    </button>
+                  )}
 
                   {/* Divider */}
                   <div className="border-t border-gray-200 my-3"></div>

@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import RelatedProducts from "../components/RelatedProducts";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const ProductDetails = () => {
+  const { user, refreshCart } = useAppContext();
+  const navigate = useNavigate();
   const params = useParams();
   const productId = params.productId || params.id;
   const [product, setProduct] = useState(null);
@@ -11,6 +15,7 @@ const ProductDetails = () => {
   const [error, setError] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Format price with thousand separator
   const formatPrice = (price) => {
@@ -45,6 +50,138 @@ const ProductDetails = () => {
       console.log("No productId found in params:", params);
     }
   }, [productId]);
+
+  // Thêm vào giỏ hàng
+  const handleAddToCart = async () => {
+    if (!user) {
+      toast.error("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
+      navigate("/login");
+      return;
+    }
+
+    if (quantity < 1) {
+      toast.error("Số lượng không hợp lệ!");
+      return;
+    }
+
+    setIsAddingToCart(true);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
+
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/cart/items",
+        {
+          products: [
+            {
+              productId: productId,
+              quantity: quantity,
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`, {
+          duration: 2000,
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            fontWeight: "500",
+          },
+        });
+        refreshCart(); // Cập nhật số lượng giỏ hàng trong navbar
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!", {
+          duration: 2500,
+        });
+        navigate("/login");
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            "Có lỗi xảy ra khi thêm vào giỏ hàng!"
+        );
+      }
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  // Mua ngay
+  const handleBuyNow = async () => {
+    if (!user) {
+      toast.error("Vui lòng đăng nhập để mua hàng!");
+      navigate("/login");
+      return;
+    }
+
+    if (quantity < 1) {
+      toast.error("Số lượng không hợp lệ!");
+      return;
+    }
+
+    setIsAddingToCart(true);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
+
+      // Thêm vào giỏ hàng trước
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/cart/items",
+        {
+          products: [
+            {
+              productId: productId,
+              quantity: quantity,
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        refreshCart(); // Cập nhật giỏ hàng
+        // Navigate ngay sang trang giỏ hàng
+        navigate("/cart");
+      }
+    } catch (error) {
+      console.error("Error buying now:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!");
+        navigate("/login");
+      } else {
+        toast.error(
+          error.response?.data?.message || "Có lỗi xảy ra khi mua hàng!"
+        );
+      }
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>{error}</div>;
@@ -163,26 +300,33 @@ const ProductDetails = () => {
                 </button>
                 <span className="ml-4 text-gray-500 text-sm">
                   Còn lại:{" "}
-                  <span className="font-semibold">{product.stock}</span>
+                  <span className="font-semibold">{product.stock}</span> sản
+                  phẩm có sẵn
                 </span>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-              <button
-                type="button"
-                className="flex-1 py-3.5 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-all duration-300 border border-gray-200 hover:border-gray-300"
-              >
-                Thêm vào giỏ hàng
-              </button>
-              <button
-                type="button"
-                className="flex-1 py-3.5 px-6 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-              >
-                Mua ngay
-              </button>
-            </div>
+            {user?.role !== "admin" && (
+              <div className="flex flex-col sm:flex-row gap-3 mt-auto">
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart || product.stock < 1}
+                  className="flex-1 py-3.5 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isAddingToCart ? "Đang thêm..." : "Thêm vào giỏ hàng"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  disabled={isAddingToCart || product.stock < 1}
+                  className="flex-1 py-3.5 px-6 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {isAddingToCart ? "Đang xử lý..." : "Mua ngay"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
