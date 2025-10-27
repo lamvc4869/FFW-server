@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema(
         orderNumber: {
             type: String,
             unique: true,
-            required: true,
+            // required: true,
         },
         cartId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -46,14 +46,16 @@ const orderSchema = new mongoose.Schema(
         }],
         shippingAddress: {
             type: String,
+            required: true,
         },
         paymentMethod: {
             type: String,
-            enum: ['cod', 'stripe', 'razorpay'],
+            enum: ['cod', 'online'],
+            required: true,
         },
         paymentStatus: {
             type: String,
-            enum: ['pending', 'paid', 'failed'],
+            enum: ['pending', 'paid', 'failed', 'refunded'],
             default: 'pending',
         },
         orderStatus: {
@@ -73,6 +75,9 @@ const orderSchema = new mongoose.Schema(
         },
         notes: {
             type: String,
+        },
+        cancelAt: {
+            type: Date,
         },
     },
     { timestamps: true }

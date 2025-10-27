@@ -14,6 +14,7 @@ const Cart = () => {
     "Thanh toán khi nhận hàng"
   );
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [showOrderConfirmModal, setShowOrderConfirmModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState({
     isOpen: false,
     productId: null,
@@ -142,6 +143,68 @@ const Cart = () => {
   // Đóng modal
   const closeDeleteModal = () => {
     setDeleteModal({ isOpen: false, productId: null, productName: "" });
+  };
+
+  // Handle place order
+  const handlePlaceOrder = () => {
+    if (!user?.address) {
+      toast.error("Vui lòng thêm địa chỉ giao hàng trong Settings!");
+      setTimeout(() => navigate("/settings"), 1500);
+      return;
+    }
+    setShowOrderConfirmModal(true);
+  };
+
+  const handleConfirmOrder = async () => {
+    setIsPlacingOrder(true);
+    setShowOrderConfirmModal(false);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      // Map payment method from Vietnamese to API format
+      const paymentMethodMap = {
+        "Thanh toán khi nhận hàng": "cod",
+        Online: "online",
+      };
+
+      const orderData = {
+        shippingAddress: user.address,
+        paymentMethod: paymentMethodMap[paymentMethod] || "cod",
+        discount: 0,
+        notes: "",
+      };
+
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/order",
+        orderData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Đặt hàng thành công!");
+        // Reset cart
+        setCart(null);
+        refreshCart();
+        // Navigate to my orders
+        setTimeout(() => {
+          navigate("/orders");
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Không thể đặt hàng. Vui lòng thử lại!"
+      );
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   // Loading state
@@ -522,27 +585,7 @@ const Cart = () => {
 
                 {/* Place Order Button */}
                 <button
-                  onClick={async () => {
-                    if (isPlacingOrder) return;
-
-                    if (!user?.address) {
-                      toast.error(
-                        "Vui lòng thêm địa chỉ giao hàng trong Settings!"
-                      );
-                      setTimeout(() => navigate("/settings"), 1500);
-                      return;
-                    }
-
-                    setIsPlacingOrder(true);
-
-                    // TODO: Implement order API call here
-                    toast.success("Đặt hàng thành công!");
-
-                    setTimeout(() => {
-                      setIsPlacingOrder(false);
-                      navigate("/orders");
-                    }, 1500);
-                  }}
+                  onClick={handlePlaceOrder}
                   disabled={isPlacingOrder}
                   className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
@@ -579,6 +622,89 @@ const Cart = () => {
           </div>
         )}
       </div>
+
+      {/* Modal xác nhận đặt hàng */}
+      {showOrderConfirmModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+            {/* Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="bg-blue-100 rounded-full p-3">
+                <svg
+                  className="w-12 h-12 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Tiêu đề */}
+            <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+              Xác nhận đặt hàng
+            </h3>
+
+            {/* Nội dung */}
+            <div className="text-sm text-gray-600 mb-6 space-y-2">
+              <p className="text-center mb-4">
+                Bạn có chắc chắn muốn đặt hàng với thông tin sau?
+              </p>
+
+              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">Địa chỉ:</span>
+                  <span className="text-right max-w-[60%] text-gray-800">
+                    {user?.address}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">Thanh toán:</span>
+                  <span className="text-gray-800">{paymentMethod}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-700">
+                    Số sản phẩm:
+                  </span>
+                  <span className="text-gray-800">
+                    {cartProducts.length} sản phẩm
+                  </span>
+                </div>
+                <div className="flex justify-between border-t pt-2 mt-2">
+                  <span className="font-bold text-gray-800">Tổng tiền:</span>
+                  <span className="font-bold text-blue-600">
+                    {formatPrice(totalAmount)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowOrderConfirmModal(false)}
+                disabled={isPlacingOrder}
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all disabled:opacity-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmOrder}
+                disabled={isPlacingOrder}
+                className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50"
+              >
+                {isPlacingOrder ? "Đang xử lý..." : "Xác nhận"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal xác nhận xóa */}
       {deleteModal.isOpen && (
