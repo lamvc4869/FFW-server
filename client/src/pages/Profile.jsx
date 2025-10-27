@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { images } from "../images";
 import { useAppContext } from "../context/AppContext";
 import axios from "axios";
+import toast from "react-hot-toast";
+import OrderCard from "../components/OrderCard";
 import {
   FaShoppingBag,
   FaClock,
@@ -13,30 +15,67 @@ import {
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, setUser, logout } = useAppContext();
-  const [orders, setOrders] = useState(() => {
-    const o = localStorage.getItem("orders");
-    return o ? JSON.parse(o) : [];
-  });
+  const { user, setUser, logout, formatPrice } = useAppContext();
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [loadingUser, setLoadingUser] = useState(false);
 
-  // Hàm logout đơn giản
-  // logout đã lấy từ context, không cần định nghĩa lại
+  // Fetch orders from API
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!user) {
+        setLoadingOrders(false);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get(
+          "http://localhost:3000/api/v1/order/orders",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Xử lý cả trường hợp success: true và success: false
+        setOrders(response.data.orders || []);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        // Nếu lỗi 404 (không có đơn hàng) thì set orders = []
+        if (error.response?.status === 404) {
+          setOrders([]);
+        } else {
+          toast.error("Không thể tải đơn hàng");
+        }
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user]);
 
   // Calculate real stats from orders - Memoized để tránh recalculate mỗi render
   const orderStats = useMemo(() => {
     const totalOrders = orders.length;
     const processingOrders = orders.filter(
-      (o) => o.status === "Processing"
+      (o) =>
+        o.orderStatus === "pending" ||
+        o.orderStatus === "confirmed" ||
+        o.orderStatus === "processing"
     ).length;
     const completedOrders = orders.filter(
-      (o) => o.status === "Completed"
+      (o) => o.orderStatus === "delivered"
     ).length;
     const cancelledOrders = orders.filter(
-      (o) => o.status === "Cancelled"
+      (o) => o.orderStatus === "cancelled"
     ).length;
-    const rejectedOrders = orders.filter((o) => o.status === "Rejected").length;
+    const shippedOrders = orders.filter(
+      (o) => o.orderStatus === "shipped"
+    ).length;
     const totalPoints = completedOrders * 50; // 50 points per completed order
 
     return {
@@ -44,7 +83,7 @@ const Profile = () => {
       processingOrders,
       completedOrders,
       cancelledOrders,
-      rejectedOrders,
+      shippedOrders,
       totalPoints,
     };
   }, [orders]);
@@ -54,38 +93,13 @@ const Profile = () => {
     processingOrders,
     completedOrders,
     cancelledOrders,
-    rejectedOrders,
+    shippedOrders,
     totalPoints,
   } = orderStats;
 
   // Get recent orders (latest 5) - Memoized
   const recentOrders = useMemo(() => {
-    return orders.slice(0, 5).map((order) => ({
-      id: order.id,
-      date: new Date(order.date).toLocaleDateString("vi-VN"),
-      items: order.products.map((p) => p.name).join(", "),
-      total: `${order.totalAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}đ`,
-      status:
-        order.status === "Processing"
-          ? "Đang xử lý"
-          : order.status === "Completed"
-            ? "Hoàn thành"
-            : order.status === "Cancelled"
-              ? "Đã hủy"
-              : order.status === "Rejected"
-                ? "Từ chối"
-                : order.status,
-      statusColor:
-        order.status === "Processing"
-          ? "bg-blue-100 text-blue-700"
-          : order.status === "Completed"
-            ? "bg-green-100 text-green-700"
-            : order.status === "Cancelled"
-              ? "bg-red-100 text-red-700"
-              : order.status === "Rejected"
-                ? "bg-orange-100 text-orange-700"
-                : "bg-gray-100 text-gray-700",
-    }));
+    return orders.slice(0, 5);
   }, [orders]);
 
   const userStats = [
@@ -108,57 +122,12 @@ const Profile = () => {
       color: "from-green-500 to-emerald-500",
     },
     {
-      label: "Đã hủy/Từ chối",
-      value: cancelledOrders + rejectedOrders,
+      label: "Đã hủy",
+      value: cancelledOrders,
       icon: FaTimesCircle,
       color: "from-red-500 to-pink-500",
     },
   ];
-
-  // Get recent activities from orders - Memoized
-  const recentActivities = useMemo(() => {
-    return orders.slice(0, 4).map((order) => {
-      if (order.status === "Processing") {
-        return {
-          icon: "🛒",
-          text: `Đã đặt đơn hàng ${order.id}`,
-          time: new Date(order.date).toLocaleDateString("vi-VN"),
-          color: "bg-green-50",
-        };
-      } else if (order.status === "Completed") {
-        return {
-          icon: "✅",
-          text: `Đơn hàng ${order.id} đã giao thành công`,
-          time: new Date(order.date).toLocaleDateString("vi-VN"),
-          color: "bg-blue-50",
-        };
-      } else if (order.status === "Cancelled") {
-        return {
-          icon: "❌",
-          text: `Đã hủy đơn hàng ${order.id}`,
-          time: new Date(order.cancelledAt || order.date).toLocaleDateString(
-            "vi-VN"
-          ),
-          color: "bg-red-50",
-        };
-      } else if (order.status === "Rejected") {
-        return {
-          icon: "⚠️",
-          text: `Đơn hàng ${order.id} bị từ chối`,
-          time: new Date(order.cancelledAt || order.date).toLocaleDateString(
-            "vi-VN"
-          ),
-          color: "bg-orange-50",
-        };
-      }
-      return {
-        icon: "📦",
-        text: `Đơn hàng ${order.id}`,
-        time: new Date(order.date).toLocaleDateString("vi-VN"),
-        color: "bg-gray-50",
-      };
-    });
-  }, [orders]);
 
   // Fetch user mới nhất từ API khi mount (nếu user đang login)
   useEffect(() => {
@@ -322,44 +291,21 @@ const Profile = () => {
                 Đơn hàng gần đây
               </h2>
             </div>
-            {recentOrders.length > 0 ? (
+            {loadingOrders ? (
+              <div className="p-12 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Đang tải đơn hàng...</p>
+              </div>
+            ) : recentOrders.length > 0 ? (
               <>
-                <div className="divide-y">
-                  {recentOrders.map((order, index) => (
-                    <div
-                      key={index}
-                      className="p-6 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <div className="font-bold text-gray-900 mb-1">
-                            {order.id}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {order.date}
-                          </div>
-                        </div>
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${order.statusColor}`}
-                        >
-                          {order.status}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 mb-2 line-clamp-1">
-                        {order.items}
-                      </p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-green-600">
-                          {order.total}
-                        </span>
-                        <button
-                          onClick={() => navigate("/orders")}
-                          className="text-green-600 hover:text-green-700 font-medium text-sm"
-                        >
-                          Xem chi tiết →
-                        </button>
-                      </div>
-                    </div>
+                <div className="p-6 space-y-4">
+                  {recentOrders.map((order) => (
+                    <OrderCard
+                      key={order._id}
+                      order={order}
+                      formatPrice={formatPrice}
+                      isAdmin={false}
+                    />
                   ))}
                 </div>
                 <div className="p-4 bg-gray-50 text-center">

@@ -1,308 +1,195 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import axios from "axios";
+import OrderCard from "../components/OrderCard";
+import OrderStatsCard from "../components/OrderStatsCard";
+import OrderFilterTab from "../components/OrderFilterTab";
 
 const SellerOrders = () => {
-  const { orders, formatPrice, rejectOrder, deleteOrder } = useAppContext();
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [rejectReason, setRejectReason] = useState("");
-  const [customReason, setCustomReason] = useState("");
+  const { formatPrice } = useAppContext();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState("all");
 
-  const rejectReasons = [
-    "Sản phẩm hết hàng",
-    "Không thể giao đến địa chỉ này",
-    "Thông tin đơn hàng không hợp lệ",
-    "Giá sản phẩm đã thay đổi",
-    "Lý do khác",
-  ];
+  // Fetch all orders from API
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get(
+          "http://localhost:3000/api/v1/admin/orders",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-  const handleRejectClick = (orderId) => {
-    setSelectedOrderId(orderId);
-    setShowRejectModal(true);
-    setRejectReason("");
-    setCustomReason("");
-  };
+        if (response.data.success) {
+          setOrders(response.data.orders || []);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        toast.error("Không thể tải danh sách đơn hàng");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleConfirmReject = () => {
-    if (!rejectReason) {
-      toast.error("Vui lòng chọn lý do từ chối");
-      return;
-    }
-    if (rejectReason === "Lý do khác" && !customReason.trim()) {
-      toast.error("Vui lòng nhập lý do cụ thể");
-      return;
-    }
+    fetchOrders();
+  }, []);
 
-    const finalReason =
-      rejectReason === "Lý do khác" ? customReason : rejectReason;
-    rejectOrder(selectedOrderId, finalReason);
-    toast.success("Đã từ chối đơn hàng");
-    setShowRejectModal(false);
-  };
-
-  const handleDeleteOrder = (orderId) => {
-    if (
-      window.confirm(
-        "Bạn có chắc muốn xóa đơn hàng này? Hành động này không thể hoàn tác!"
+  // Handle status update
+  const handleStatusUpdate = (orderId, newStatus) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order._id === orderId ? { ...order, orderStatus: newStatus } : order
       )
-    ) {
-      deleteOrder(orderId);
-      toast.success("Đã xóa đơn hàng");
-    }
+    );
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Processing":
-        return "text-blue-600 bg-blue-50";
-      case "Cancelled":
-        return "text-red-600 bg-red-50";
-      case "Rejected":
-        return "text-orange-600 bg-orange-50";
-      case "Completed":
-        return "text-green-600 bg-green-50";
-      default:
-        return "text-gray-600 bg-gray-50";
-    }
+  // Filter orders
+  const filteredOrders =
+    filterStatus === "all"
+      ? orders
+      : orders.filter((order) => order.orderStatus === filterStatus);
+
+  // Calculate stats
+  const stats = {
+    total: orders.length,
+    pending: orders.filter((o) => o.orderStatus === "pending").length,
+    confirmed: orders.filter((o) => o.orderStatus === "confirmed").length,
+    processing: orders.filter((o) => o.orderStatus === "processing").length,
+    shipped: orders.filter((o) => o.orderStatus === "shipped").length,
+    delivered: orders.filter((o) => o.orderStatus === "delivered").length,
+    cancelled: orders.filter((o) => o.orderStatus === "cancelled").length,
   };
+
+  if (loading) {
+    return (
+      <div className="py-8 px-6 md:px-12 bg-white min-h-[calc(100vh-73px)]">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Đang tải đơn hàng...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-8 px-6 md:px-12 bg-white min-h-[calc(100vh-73px)]">
-      <h2 className="text-2xl font-bold text-gray-800 mb-8">Đơn hàng</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        Quản lý đơn hàng
+      </h2>
 
-      {orders.length === 0 ? (
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
+        <OrderStatsCard label="Tất cả" count={stats.total} variant="default" />
+        <OrderStatsCard
+          label="Chờ xác nhận"
+          count={stats.pending}
+          variant="pending"
+        />
+        <OrderStatsCard
+          label="Đã xác nhận"
+          count={stats.confirmed}
+          variant="confirmed"
+        />
+        <OrderStatsCard
+          label="Đang xử lý"
+          count={stats.processing}
+          variant="processing"
+        />
+        <OrderStatsCard
+          label="Đang giao"
+          count={stats.shipped}
+          variant="shipped"
+        />
+        <OrderStatsCard
+          label="Hoàn thành"
+          count={stats.delivered}
+          variant="delivered"
+        />
+        <OrderStatsCard
+          label="Đã hủy"
+          count={stats.cancelled}
+          variant="cancelled"
+        />
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        <OrderFilterTab
+          label="Tất cả"
+          count={stats.total}
+          isActive={filterStatus === "all"}
+          onClick={() => setFilterStatus("all")}
+        />
+        <OrderFilterTab
+          label="Chờ xác nhận"
+          count={stats.pending}
+          isActive={filterStatus === "pending"}
+          onClick={() => setFilterStatus("pending")}
+        />
+        <OrderFilterTab
+          label="Đã xác nhận"
+          count={stats.confirmed}
+          isActive={filterStatus === "confirmed"}
+          onClick={() => setFilterStatus("confirmed")}
+        />
+        <OrderFilterTab
+          label="Đang xử lý"
+          count={stats.processing}
+          isActive={filterStatus === "processing"}
+          onClick={() => setFilterStatus("processing")}
+        />
+        <OrderFilterTab
+          label="Đang giao"
+          count={stats.shipped}
+          isActive={filterStatus === "shipped"}
+          onClick={() => setFilterStatus("shipped")}
+        />
+        <OrderFilterTab
+          label="Hoàn thành"
+          count={stats.delivered}
+          isActive={filterStatus === "delivered"}
+          onClick={() => setFilterStatus("delivered")}
+        />
+        <OrderFilterTab
+          label="Đã hủy"
+          count={stats.cancelled}
+          isActive={filterStatus === "cancelled"}
+          onClick={() => setFilterStatus("cancelled")}
+        />
+      </div>
+
+      {/* Orders List */}
+      {filteredOrders.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl">
           <div className="text-6xl mb-4">📦</div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Chưa có đơn hàng nào
+            Không có đơn hàng
           </h3>
           <p className="text-gray-500">
-            Đơn hàng từ khách hàng sẽ xuất hiện ở đây
+            {filterStatus === "all"
+              ? "Chưa có đơn hàng nào từ khách hàng"
+              : `Không có đơn hàng nào ở trạng thái này`}
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-            >
-              {/* Order Status Bar */}
-              <div className="px-6 py-3 bg-gray-50 border-b flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600">
-                    Order ID:{" "}
-                    <span className="font-mono font-semibold">{order.id}</span>
-                  </span>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}
-                  >
-                    {order.status}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  {order.status === "Processing" && (
-                    <button
-                      onClick={() => handleRejectClick(order.id)}
-                      className="px-4 py-1.5 bg-orange-50 border border-orange-300 text-orange-700 rounded-lg text-sm font-medium hover:bg-orange-100 transition-all"
-                    >
-                      Từ chối
-                    </button>
-                  )}
-                  {(order.status === "Cancelled" ||
-                    order.status === "Rejected") && (
-                    <button
-                      onClick={() => handleDeleteOrder(order.id)}
-                      className="px-4 py-1.5 bg-red-50 border border-red-300 text-red-700 rounded-lg text-sm font-medium hover:bg-red-100 transition-all"
-                    >
-                      Xóa
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Cancel/Reject Info */}
-              {(order.status === "Cancelled" || order.status === "Rejected") &&
-                order.cancelReason && (
-                  <div className="px-6 py-3 bg-red-50 border-b border-red-100">
-                    <p className="text-sm text-red-700">
-                      <span className="font-semibold">Lý do:</span>{" "}
-                      {order.cancelReason}
-                    </p>
-                    <p className="text-xs text-red-600 mt-1">
-                      {order.cancelledBy === "seller"
-                        ? "Từ chối bởi Seller"
-                        : "Hủy bởi khách hàng"}{" "}
-                      - {new Date(order.cancelledAt).toLocaleString("vi-VN")}
-                    </p>
-                  </div>
-                )}
-
-              {/* Order Card */}
-              <div className="p-6">
-                <div className="flex items-start gap-6">
-                  {/* Product Image with Count Badge */}
-                  <div className="relative flex-shrink-0">
-                    <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                      <img
-                        src={order.products[0]?.image}
-                        alt={order.products[0]?.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {order.products.length > 1 && (
-                      <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
-                        +{order.products.length - 1}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Order Details */}
-                  <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4">
-                    {/* Product Names */}
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800 mb-1">
-                        {order.products.map((p, idx) => (
-                          <span key={idx}>
-                            {p.name}
-                            {idx < order.products.length - 1 && ", "}
-                          </span>
-                        ))}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {order.products.map((p, idx) => (
-                          <span key={idx}>
-                            x{p.quantity}
-                            {idx < order.products.length - 1 && " | "}
-                          </span>
-                        ))}
-                      </p>
-                    </div>
-
-                    {/* Shipping Address */}
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">
-                        Shipping Address
-                      </p>
-                      <p className="text-sm text-gray-800 font-medium">
-                        {order.address?.street || "Great Stock"}
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        {order.address?.city || "Street 123, Main City"}
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        {order.address?.state || "New State"},
-                        {order.address?.country || "IN"}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {order.address?.zip || "123456"},
-                        {order.address?.phone || "1234567890"}
-                      </p>
-                    </div>
-
-                    {/* Total Amount */}
-                    <div className="flex flex-col justify-center">
-                      <p className="text-2xl font-bold text-gray-800">
-                        {formatPrice(order.totalAmount)}
-                      </p>
-                    </div>
-
-                    {/* Payment & Status Info */}
-                    <div className="flex flex-col justify-center text-sm">
-                      <div className="space-y-1">
-                        <p className="text-gray-600">
-                          <span className="font-medium">Method:</span>{" "}
-                          {order.paymentMethod}
-                        </p>
-                        <p className="text-gray-600">
-                          <span className="font-medium">Date:</span>{" "}
-                          {new Date(order.date).toLocaleDateString()}
-                        </p>
-                        <p>
-                          <span className="font-medium">Payment:</span>{" "}
-                          <span
-                            className={`${
-                              order.paymentMethod === "Online"
-                                ? "text-green-600"
-                                : "text-orange-600"
-                            } font-semibold`}
-                          >
-                            {order.paymentMethod === "Online"
-                              ? "Paid"
-                              : "Pending"}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="space-y-4">
+          {filteredOrders.map((order) => (
+            <OrderCard
+              key={order._id}
+              order={order}
+              formatPrice={formatPrice}
+              isAdmin={true}
+              onStatusUpdate={handleStatusUpdate}
+            />
           ))}
-        </div>
-      )}
-
-      {/* Reject Order Modal */}
-      {showRejectModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">
-              Từ chối đơn hàng
-            </h3>
-
-            <p className="text-sm text-gray-600 mb-4">
-              Vui lòng chọn lý do từ chối đơn hàng:
-            </p>
-
-            <div className="space-y-2 mb-4">
-              {rejectReasons.map((reason, index) => (
-                <label
-                  key={index}
-                  className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                    rejectReason === reason
-                      ? "border-orange-500 bg-orange-50"
-                      : "border-gray-200 hover:border-orange-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="rejectReason"
-                    value={reason}
-                    checked={rejectReason === reason}
-                    onChange={(e) => setRejectReason(e.target.value)}
-                    className="mr-3 text-orange-600 focus:ring-orange-500"
-                  />
-                  <span className="text-sm text-gray-700">{reason}</span>
-                </label>
-              ))}
-            </div>
-
-            {rejectReason === "Lý do khác" && (
-              <textarea
-                value={customReason}
-                onChange={(e) => setCustomReason(e.target.value)}
-                placeholder="Nhập lý do cụ thể..."
-                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none resize-none mb-4"
-                rows={3}
-              />
-            )}
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowRejectModal(false)}
-                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all"
-              >
-                Đóng
-              </button>
-              <button
-                onClick={handleConfirmReject}
-                className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-all shadow-lg"
-              >
-                Xác nhận từ chối
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>

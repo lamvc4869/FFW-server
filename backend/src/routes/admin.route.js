@@ -11,6 +11,8 @@ import getAllProductsController from "../controllers/sharedControllers/getAllPro
 import searchProductByNameController from "../controllers/sharedControllers/searchProductByName.controller.js";
 import updateProductController from "../controllers/adminControllers/updateProduct.controller.js";
 import getProductByIdController from "../controllers/sharedControllers/getProductById.controller.js";
+import getAllOrdersController from "../controllers/adminControllers/getAllOrders.controller.js";
+import updateOrderStatusController from "../controllers/adminControllers/updateOrderStatus.controller.js";
 
 const router = express.Router();
 
@@ -19,7 +21,9 @@ router.use(verifyAdmin);
 
 router.get("/users", getAllUsersController);
 router.get("/stats", getUserStatsController);
+router.get("/orders", getAllOrdersController);
 router.delete("/user/:userId", deleteUserController);
+router.patch("/order/status/:orderId", updateOrderStatusController);
 
 router.get('/products', getAllProductsController);
 router.post("/product", upload.array("image", 4), createProductController);
