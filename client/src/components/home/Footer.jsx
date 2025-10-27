@@ -1,5 +1,6 @@
 import React from "react";
-import { images } from "../images";
+import { images } from "../../images";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const linkSections = [
@@ -109,14 +110,14 @@ const Footer = () => {
                       "hover:bg-red-600 hover:shadow-red-600/25 hover:text-white",
                     ];
                     return (
-                      <a
+                      <Link
                         key={index}
                         href="#"
                         className={`w-12 h-12 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center text-gray-600 ${hoverColors[index]} transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-2 hover:scale-110`}
                         aria-label={social.name}
                       >
                         {social.icon}
-                      </a>
+                      </Link>
                     );
                   })}
                 </div>
@@ -135,12 +136,12 @@ const Footer = () => {
                     <ul className="space-y-4">
                       {section.links.map((link, i) => (
                         <li key={i}>
-                          <a
+                          <Link
                             href={link.href}
                             className="text-gray-600 hover:text-green-600 transition-all duration-200 font-medium hover:translate-x-2 transform inline-block hover:scale-105"
                           >
                             {link.name}
-                          </a>
+                          </Link>
                         </li>
                       ))}
                     </ul>
@@ -159,18 +160,18 @@ const Footer = () => {
                 Copyright {new Date().getFullYear()} © FruitHub. All rights
                 reserved.
               </span>
-              <a
+              <Link
                 href="/privacy"
                 className="hover:text-green-600 transition-colors font-medium"
               >
                 Privacy Policy
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/terms"
                 className="hover:text-green-600 transition-colors font-medium"
               >
                 Terms of Service
-              </a>
+              </Link>
             </div>
           </div>
         </div>

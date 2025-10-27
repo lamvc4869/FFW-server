@@ -25,24 +25,7 @@ export const AppContextProvider = ({ children }) => {
   });
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [cartItems, setCartItems] = useState({});
-  const [addresses, setAddresses] = useState(() => {
-    const savedAddresses = localStorage.getItem("addresses");
-    return savedAddresses
-      ? JSON.parse(savedAddresses)
-      : [
-          {
-            id: 1,
-            name: "Nhà riêng",
-            fullName: "Nguyễn Văn A",
-            phone: "0123456789",
-            street: "123 Nguyễn Huệ",
-            city: "Quận 1",
-            state: "TP.HCM",
-            country: "Việt Nam",
-            isDefault: true,
-          },
-        ];
-  });
+  const [addresses, setAddresses] = useState();
   const [orders, setOrders] = useState(() => {
     const savedOrders = localStorage.getItem("orders");
     return savedOrders ? JSON.parse(savedOrders) : [];
@@ -53,6 +36,12 @@ export const AppContextProvider = ({ children }) => {
     localStorage.getItem("accessToken") || null
   );
   const [products, setProducts] = useState([]);
+  const [cartRefreshTrigger, setCartRefreshTrigger] = useState(0);
+
+  // Function to trigger cart refresh in NavBar
+  const refreshCart = () => {
+    setCartRefreshTrigger((prev) => prev + 1);
+  };
 
   const fetchProducts = async () => {
     try {
@@ -255,7 +244,7 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const getDefaultAddress = () => {
-    return addresses.find((addr) => addr.isDefault) || addresses[0] || null;
+    return "";
   };
 
   const value = {
@@ -297,6 +286,8 @@ export const AppContextProvider = ({ children }) => {
     getDefaultAddress,
     axios,
     fetchProducts,
+    cartRefreshTrigger,
+    refreshCart,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

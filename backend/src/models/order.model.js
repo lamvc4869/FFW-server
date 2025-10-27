@@ -45,24 +45,7 @@ const orderSchema = new mongoose.Schema(
             },
         }],
         shippingAddress: {
-            name: {
-                type: String,
-            },
-            phone: {
-                type: String,
-            },
-            street: {
-                type: String,
-            },
-            city: {
-                type: String,
-            },
-            zipcode: {
-                type: String,
-            },
-            country: {
-                type: String,
-            },
+            type: String,
         },
         paymentMethod: {
             type: String,

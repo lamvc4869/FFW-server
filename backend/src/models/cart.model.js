@@ -61,6 +61,6 @@ cartSchema.index({ userId: 1 }, { unique: true });
 cartSchema.index({ 'products.productId': 1 });
 cartSchema.index({ userId: 1, status: 1 }, { unique: true, partialFilterExpression: { status: 'active' } });
 
-const Cart = mongoose.model("cart", cartSchema);
+const Cart = mongoose.models.cart || mongoose.model("cart", cartSchema);
 
 export default Cart;

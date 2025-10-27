@@ -82,8 +82,8 @@ function About() {
           {user && (
             <div className="bg-white/80 backdrop-blur-sm border border-green-200 rounded-2xl p-6 mb-8 text-center shadow-lg max-w-2xl mx-auto">
               <p className="text-lg text-gray-700">
-                👋 Chào mừng trở lại,{" "}
-                <span className="font-bold text-green-600">{user.name}</span>!
+                Chào mừng {user.firstName} {user.lastName} đã trở lại
+                <span className="font-bold text-green-600">{user.name}</span>
                 <br />
                 <span className="text-sm text-gray-600">
                   Cảm ơn bạn đã là một phần của gia đình chúng tôi
@@ -143,14 +143,14 @@ function About() {
               </div>
 
               {/* Call to Action */}
-              <div className="mt-8 flex flex-wrap gap-4">
+              {/* <div className="mt-8 flex flex-wrap gap-4">
                 <button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
                   Mua ngay
                 </button>
                 <button className="bg-white border-2 border-gray-200 hover:border-green-500 text-gray-800 px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-md">
                   Tìm hiểu thêm
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Icon Grid */}

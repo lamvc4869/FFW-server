@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { useAppContext } from "../context/AppContext";
+import { FaUser, FaMapMarkerAlt, FaKey } from "react-icons/fa";
 
 const Settings = () => {
   const navigate = useNavigate();
+  const { setUser } = useAppContext();
   const [activeTab, setActiveTab] = useState("account");
   const [loading, setLoading] = useState(true);
 
@@ -73,31 +77,23 @@ const Settings = () => {
 
   const [addressData, setAddressData] = useState(null);
 
-  const [notificationSettings, setNotificationSettings] = useState({
-    orderUpdates: true,
-    promotions: true,
-    newProducts: false,
-    newsletter: true,
-    smsNotifications: false,
-    emailNotifications: true,
-  });
-
-  const [privacySettings, setPrivacySettings] = useState({
-    showProfile: true,
-    showOrders: false,
-    allowDataSharing: false,
-  });
-
   const [changePassword, setChangePassword] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
+  // Lấy thông tin user từ localStorage
+  const userStr = localStorage.getItem("user");
+  const currentUser = userStr ? JSON.parse(userStr) : null;
+
+  // Tạo danh sách tabs dựa trên role
   const tabs = [
-    { id: "account", name: "Tài khoản", icon: "👤" },
-    { id: "address", name: "Địa chỉ", icon: "📍" },
-    { id: "password", name: "Đổi mật khẩu", icon: "🔑" },
+    { id: "account", name: "Tài khoản", icon: FaUser },
+    ...(currentUser?.role !== "admin"
+      ? [{ id: "address", name: "Địa chỉ", icon: FaMapMarkerAlt }]
+      : []),
+    { id: "password", name: "Đổi mật khẩu", icon: FaKey },
   ];
 
   const handleSaveAccount = async (e) => {
@@ -146,7 +142,7 @@ const Settings = () => {
         };
         localStorage.setItem("user", JSON.stringify(updatedUser));
 
-        alert("Cập nhật thông tin thành công");
+        toast.success("Cập nhật thông tin thành công");
       }
     } catch (error) {
       console.error("Error updating user data:", error);
@@ -156,7 +152,7 @@ const Settings = () => {
         localStorage.removeItem("user");
         navigate("/login");
       } else {
-        alert(
+        toast.error(
           "Có lỗi xảy ra khi cập nhật thông tin: " +
             (error.response?.data?.message || error.message)
         );
@@ -166,19 +162,46 @@ const Settings = () => {
     }
   };
 
-  const handleSavePassword = (e) => {
+  const handleSavePassword = async (e) => {
     e.preventDefault();
-    if (changePassword.newPassword !== changePassword.confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp");
-      return;
+    try {
+      if (changePassword.newPassword !== changePassword.confirmPassword) {
+        toast.error("Mật khẩu xác nhận không khớp");
+        return;
+      }
+
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        toast.error("Bạn cần đăng nhập lại để thực hiện chức năng này");
+        return;
+      }
+
+      const response = await axios.patch(
+        "http://localhost:3000/api/v1/user/change-password",
+        {
+          currentPassword: changePassword.currentPassword,
+          newPassword: changePassword.newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success(response.data.message);
+
+      if (response.data.success) {
+        setChangePassword({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error(error.response?.data?.message);
     }
-    // Implement password change logic
-    alert("Đã đổi mật khẩu thành công");
-    setChangePassword({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
   };
 
   const handleSaveAddress = async () => {
@@ -188,7 +211,7 @@ const Settings = () => {
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!token || !user?._id) {
-        alert("Bạn cần đăng nhập lại để thực hiện chức năng này");
+        toast.error("Bạn cần đăng nhập lại để thực hiện chức năng này");
         return;
       }
 
@@ -211,11 +234,68 @@ const Settings = () => {
           address: addressData,
         };
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        alert("Cập nhật địa chỉ thành công");
+        setUser(updatedUser); // Cập nhật context để UI phản ánh ngay
+        toast.success("Cập nhật địa chỉ thành công");
       }
     } catch (error) {
       console.error("Error updating address:", error);
-      alert("Có lỗi xảy ra khi cập nhật địa chỉ");
+      toast.error("Có lỗi xảy ra khi cập nhật địa chỉ");
+    }
+  };
+
+  // Xử lý upload avatar
+  const handleAvatarChange = async (file) => {
+    if (!file) return;
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const userStr = localStorage.getItem("user");
+      const user = JSON.parse(userStr);
+
+      if (!token || !user?._id) {
+        toast.error("Bạn cần đăng nhập lại để thực hiện chức năng này");
+        return;
+      }
+
+      // Tạo FormData object để gửi file
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      // Gọi API để upload avatar
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/user/${user._id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Avatar Upload Response:", response.data);
+      console.log(response.data.success);
+      if (response.data.success) {
+        // Cập nhật state và localStorage
+        setAccountData({
+          ...accountData,
+          avatar: response.data.data.avatar,
+        });
+        const updatedUser = {
+          ...user,
+          avatar: response.data.data.avatar,
+        };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        // Cập nhật user trong context để Navbar cập nhật
+        setUser(updatedUser);
+        toast.success("Cập nhật ảnh đại diện thành công");
+      }
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Có lỗi xảy ra khi cập nhật ảnh đại diện"
+      );
     }
   };
 
@@ -258,20 +338,23 @@ const Settings = () => {
           {/* Sidebar */}
           <div className="lg:w-64 flex-shrink-0">
             <div className="bg-white rounded-xl shadow-sm border overflow-hidden sticky top-32">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all ${
-                    activeTab === tab.id
-                      ? "bg-gradient-to-r from-green-50 to-emerald-50 border-r-4 border-green-600 text-green-700 font-semibold"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <span className="text-xl">{tab.icon}</span>
-                  <span className="text-sm">{tab.name}</span>
-                </button>
-              ))}
+              {tabs.map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all ${
+                      activeTab === tab.id
+                        ? "bg-gradient-to-r from-green-50 to-emerald-50 border-r-4 border-green-600 text-green-700 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <IconComponent className="text-lg" />
+                    <span className="text-sm">{tab.name}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -309,8 +392,18 @@ const Settings = () => {
                       <h3 className="font-semibold text-gray-900 mb-1">
                         {accountData.firstName} {accountData.lastName}
                       </h3>
+                      <input
+                        type="file"
+                        id="avatar-upload"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleAvatarChange(e.target.files[0])}
+                      />
                       <button
                         type="button"
+                        onClick={() =>
+                          document.getElementById("avatar-upload").click()
+                        }
                         className="text-sm text-green-600 hover:text-green-700 font-medium"
                       >
                         Thay đổi ảnh đại diện
@@ -438,236 +531,6 @@ const Settings = () => {
               </div>
             )}
 
-            {/* Notifications Tab */}
-            {activeTab === "notifications" && (
-              <div className="bg-white rounded-xl shadow-sm border p-6">
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    Cài đặt thông báo
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Quản lý cách bạn nhận thông báo
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  {/* Email Notifications */}
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-4">
-                      Thông báo qua Email
-                    </h3>
-                    <div className="space-y-3">
-                      <ToggleItem
-                        label="Cập nhật đơn hàng"
-                        description="Nhận thông báo về trạng thái đơn hàng"
-                        checked={notificationSettings.orderUpdates}
-                        onChange={(checked) =>
-                          setNotificationSettings({
-                            ...notificationSettings,
-                            orderUpdates: checked,
-                          })
-                        }
-                      />
-                      <ToggleItem
-                        label="Khuyến mãi & Ưu đãi"
-                        description="Nhận thông tin về các chương trình khuyến mãi"
-                        checked={notificationSettings.promotions}
-                        onChange={(checked) =>
-                          setNotificationSettings({
-                            ...notificationSettings,
-                            promotions: checked,
-                          })
-                        }
-                      />
-                      <ToggleItem
-                        label="Sản phẩm mới"
-                        description="Thông báo khi có sản phẩm mới"
-                        checked={notificationSettings.newProducts}
-                        onChange={(checked) =>
-                          setNotificationSettings({
-                            ...notificationSettings,
-                            newProducts: checked,
-                          })
-                        }
-                      />
-                      <ToggleItem
-                        label="Bản tin"
-                        description="Nhận bản tin hàng tuần"
-                        checked={notificationSettings.newsletter}
-                        onChange={(checked) =>
-                          setNotificationSettings({
-                            ...notificationSettings,
-                            newsletter: checked,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-6">
-                    <h3 className="font-semibold text-gray-900 mb-4">
-                      Thông báo khác
-                    </h3>
-                    <div className="space-y-3">
-                      <ToggleItem
-                        label="Thông báo SMS"
-                        description="Nhận tin nhắn SMS về đơn hàng"
-                        checked={notificationSettings.smsNotifications}
-                        onChange={(checked) =>
-                          setNotificationSettings({
-                            ...notificationSettings,
-                            smsNotifications: checked,
-                          })
-                        }
-                      />
-                      <ToggleItem
-                        label="Thông báo Email"
-                        description="Bật/tắt tất cả thông báo email"
-                        checked={notificationSettings.emailNotifications}
-                        onChange={(checked) =>
-                          setNotificationSettings({
-                            ...notificationSettings,
-                            emailNotifications: checked,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Privacy Tab */}
-            {activeTab === "privacy" && (
-              <div className="bg-white rounded-xl shadow-sm border p-6">
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    Quyền riêng tư
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Kiểm soát thông tin cá nhân của bạn
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <div className="flex gap-3">
-                      <svg
-                        className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <div>
-                        <h4 className="font-semibold text-yellow-900 mb-1">
-                          Bảo vệ thông tin cá nhân
-                        </h4>
-                        <p className="text-sm text-yellow-800">
-                          Chúng tôi cam kết bảo mật thông tin của bạn theo chính
-                          sách bảo mật.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <ToggleItem
-                      label="Hiển thị hồ sơ công khai"
-                      description="Cho phép người khác xem hồ sơ của bạn"
-                      checked={privacySettings.showProfile}
-                      onChange={(checked) =>
-                        setPrivacySettings({
-                          ...privacySettings,
-                          showProfile: checked,
-                        })
-                      }
-                    />
-                    <ToggleItem
-                      label="Hiển thị lịch sử đơn hàng"
-                      description="Cho phép chia sẻ lịch sử mua hàng"
-                      checked={privacySettings.showOrders}
-                      onChange={(checked) =>
-                        setPrivacySettings({
-                          ...privacySettings,
-                          showOrders: checked,
-                        })
-                      }
-                    />
-                    <ToggleItem
-                      label="Cho phép chia sẻ dữ liệu"
-                      description="Chia sẻ dữ liệu để cải thiện trải nghiệm"
-                      checked={privacySettings.allowDataSharing}
-                      onChange={(checked) =>
-                        setPrivacySettings({
-                          ...privacySettings,
-                          allowDataSharing: checked,
-                        })
-                      }
-                    />
-                  </div>
-
-                  <div className="border-t pt-6">
-                    <h3 className="font-semibold text-gray-900 mb-4">
-                      Quản lý dữ liệu
-                    </h3>
-                    <div className="space-y-3">
-                      <button className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg hover:border-green-500 transition-colors text-left">
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            Tải xuống dữ liệu của bạn
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Nhận bản sao dữ liệu cá nhân
-                          </p>
-                        </div>
-                        <svg
-                          className="w-5 h-5 text-gray-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </button>
-                      <button className="w-full flex items-center justify-between px-4 py-3 border border-red-300 rounded-lg hover:border-red-500 transition-colors text-left">
-                        <div>
-                          <p className="font-medium text-red-600">
-                            Xóa tài khoản
-                          </p>
-                          <p className="text-sm text-red-500">
-                            Xóa vĩnh viễn tài khoản và dữ liệu
-                          </p>
-                        </div>
-                        <svg
-                          className="w-5 h-5 text-red-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Password Tab */}
             {activeTab === "password" && (
               <div className="bg-white rounded-xl shadow-sm border p-6">
@@ -718,9 +581,6 @@ const Settings = () => {
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       required
                     />
-                    <p className="text-xs text-gray-500 mt-2">
-                      Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường và số
-                    </p>
                   </div>
 
                   <div>
@@ -769,12 +629,6 @@ const Settings = () => {
                   </div>
 
                   <div className="flex gap-3 pt-4 border-t">
-                    <button
-                      type="button"
-                      className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      Hủy
-                    </button>
                     <button
                       type="submit"
                       className="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg"

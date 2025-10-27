@@ -3,21 +3,14 @@ import { images } from "../images";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const ProductCard = ({ product }) => {
-  const { currency, cartItems, addToCart, removeFromCart, formatPrice, user } =
-    useAppContext();
+  const { currency, formatPrice, user, refreshCart } = useAppContext();
   const navigate = useNavigate();
 
-  // Get cart item count
-  const getCartItemCount = (itemId) => {
-    return cartItems[itemId] || 0;
-  };
-
-  const itemCount = getCartItemCount(product._id);
-
   // Add product to cart
-  const handleAddToCart = (e, productId) => {
+  const handleAddToCart = async (e, productId) => {
     e.stopPropagation();
 
     if (!user) {
@@ -33,42 +26,81 @@ const ProductCard = ({ product }) => {
       return;
     }
 
-    const result = addToCart(productId);
-    if (result.needLogin) {
-      toast.error("Vui lòng đăng nhập để mua hàng!", {
-        duration: 2500,
-        style: {
-          background: "#ef4444",
-          color: "#fff",
-          fontWeight: "500",
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        toast.error("Vui lòng đăng nhập để mua hàng!", {
+          duration: 2500,
+          style: {
+            background: "#ef4444",
+            color: "#fff",
+            fontWeight: "500",
+          },
+        });
+        setTimeout(() => navigate("/login"), 1500);
+        return;
+      }
+
+      // Gọi API để thêm sản phẩm vào giỏ hàng
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/cart/items",
+        {
+          products: [
+            {
+              productId: productId,
+              quantity: 1,
+            },
+          ],
         },
-      });
-      setTimeout(() => navigate("/login"), 1500);
-      return;
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Đã thêm vào giỏ hàng!", {
+          duration: 2000,
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            fontWeight: "500",
+          },
+        });
+        refreshCart(); // Instantly update cart count in navbar
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!", {
+          duration: 2500,
+          style: {
+            background: "#ef4444",
+            color: "#fff",
+            fontWeight: "500",
+          },
+        });
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            "Có lỗi xảy ra khi thêm vào giỏ hàng!",
+          {
+            duration: 2500,
+            style: {
+              background: "#ef4444",
+              color: "#fff",
+              fontWeight: "500",
+            },
+          }
+        );
+      }
     }
-
-    toast.success("Đã thêm vào giỏ hàng!", {
-      duration: 2000,
-      style: {
-        background: "#10b981",
-        color: "#fff",
-        fontWeight: "500",
-      },
-    });
-  };
-
-  // Remove product from cart
-  const handleRemoveFromCart = (e, productId) => {
-    e.stopPropagation();
-    removeFromCart(productId);
-    toast.success("Removed from cart!", {
-      duration: 2000,
-      style: {
-        background: "#10b981",
-        color: "#fff",
-        fontWeight: "500",
-      },
-    });
   };
 
   return (
@@ -117,9 +149,7 @@ const ProductCard = ({ product }) => {
               {product.averageRating.toFixed(1)}
             </span>
           </div>
-          <span className="text-gray-500 text-xs">
-            Đã bán {product.sold}
-          </span>
+          <span className="text-gray-500 text-xs">Đã bán {product.sold}</span>
         </div>
 
         {/* Price */}
@@ -137,8 +167,8 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Cart Controls */}
-        <div className="flex items-center justify-center">
-          {itemCount === 0 ? (
+        {user?.role !== "admin" && (
+          <div className="flex items-center justify-center">
             <button
               onClick={(e) => handleAddToCart(e, product._id)}
               className="w-full flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-1.5 rounded-md font-medium transition-all duration-200 transform hover:scale-105 shadow-sm hover:shadow-md text-xs border border-gray-200 hover:border-gray-300"
@@ -146,52 +176,8 @@ const ProductCard = ({ product }) => {
               <img src={images.cart_icon} alt="cart" className="w-3 h-3" />
               Thêm vào giỏ hàng
             </button>
-          ) : (
-            <div className="w-full flex items-center justify-between bg-gray-100 rounded-md p-0.5">
-              <button
-                onClick={(e) => handleRemoveFromCart(e, product._id)}
-                className="flex items-center justify-center w-6 h-6 bg-white text-red-500 hover:bg-red-50 rounded shadow-sm transition-all duration-200 hover:scale-105"
-              >
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20 12H4"
-                  />
-                </svg>
-              </button>
-
-              <span className="flex-1 text-center font-semibold text-gray-800 text-xs">
-                {itemCount}
-              </span>
-
-              <button
-                onClick={(e) => handleAddToCart(e, product._id)}
-                className="flex items-center justify-center w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 rounded shadow-sm transition-all duration-200 hover:scale-105"
-              >
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              </button>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
