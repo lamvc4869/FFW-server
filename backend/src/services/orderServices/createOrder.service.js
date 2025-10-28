@@ -8,7 +8,9 @@ import {
   calculateItemTotal,
   calculateCartTotal,
 } from "../../lib/helpers/priceCalculation.service.js";
-import { updateStockOfProducts } from "../../lib/helpers/updateStock.js";
+import { decreaseProductStock } from "../../lib/helpers/updateStock.js";
+import { increaseSoldOfProducts } from "../../lib/helpers/updateSold.js";
+import { populateOrder } from "../../lib/helpers/orderPopulator.js";
 
 const createOrderService = async (userId, orderData) => {
   // Bước 1: Lấy id của user hiện tại (req.user.id)
@@ -59,7 +61,7 @@ const createOrderService = async (userId, orderData) => {
     products: orderProducts,
     shippingAddress,
     paymentMethod,
-    paymentStatus: "pending",
+    paymentStatus: paymentMethod === "online" ? "paid" : "pending",
     orderStatus: "pending",
     subtotal,
     discount,
@@ -69,13 +71,18 @@ const createOrderService = async (userId, orderData) => {
   await newOrder.save();
 
   // Bước 8: Trừ tồn kho
-  await updateStockOfProducts(cart.products);
+  await decreaseProductStock(cart.products);
 
-  // Bước 9: Xóa giỏ hàng của user
+  // Bước 9: Tăng số lượng được bán của sản phẩm
+  await increaseSoldOfProducts(cart.products);
+
+  // Bước 10: Xóa giỏ hàng của user
   // @Todo: Cần chỉnh logic ở đây sau này
   await clearCartService(userId);
 
-  return newOrder;
+  const populatedOrder = await populateOrder(newOrder._id);
+  
+  return populatedOrder;
 };
 
 export default createOrderService;

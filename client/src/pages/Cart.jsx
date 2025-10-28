@@ -37,7 +37,7 @@ const Cart = () => {
         }
 
         const response = await axios.get(
-          "http://localhost:3000/api/v1/cart/my-cart",
+          "http://localhost:3000/api/v1/cart/myCart",
           {
             headers: {
               Authorization: `Bearer ${token}`,

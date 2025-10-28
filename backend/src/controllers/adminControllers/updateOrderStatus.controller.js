@@ -13,7 +13,9 @@ const updateOrderStatusController = async (req, res) => {
   } catch (error) {
     if (
       error.message === "Không tìm thấy đơn hàng" ||
-      error.message === "Đơn hàng đã bị hủy, không thể cập nhật trạng thái"
+      error.message === "Đơn hàng đã bị hủy, không thể cập nhật trạng thái" ||
+      error.message === "Trạng thái đơn hàng không thay đổi" ||
+      error.message === "Đơn hàng đã hoàn thành, không thể cập nhật trạng thái"
     ) {
       return res.status(404).json({
         message: error.message,

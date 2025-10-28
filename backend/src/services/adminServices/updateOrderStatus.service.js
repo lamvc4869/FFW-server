@@ -1,5 +1,6 @@
 import getAllOrdersService from "./getAllOrders.service.js";
-import { restoreStockOfProducts } from "../../lib/helpers/updateStock.js";
+import { increaseProductStock } from "../../lib/helpers/updateStock.js";
+import { decreaseSoldOfProducts } from "../../lib/helpers/updateSold.js";
 
 const updateOrderStatusService = async (orderId, newStatus) => {
     const orders = await getAllOrdersService();
@@ -8,13 +9,30 @@ const updateOrderStatusService = async (orderId, newStatus) => {
         throw new Error("Không tìm thấy đơn hàng");
     }
 
-    if (orders[orderIndex].status === "cancelled") {
+    if (orders[orderIndex].orderStatus === "cancelled") {
         throw new Error("Đơn hàng đã bị hủy, không thể cập nhật trạng thái");
+    }
+
+    if (orders[orderIndex].orderStatus === newStatus) {
+        throw new Error("Trạng thái đơn hàng không thay đổi");
+    }
+
+    if (orders[orderIndex].orderStatus === "delivered") {
+        throw new Error("Đơn hàng đã hoàn thành, không thể cập nhật trạng thái");
     }
 
     if (newStatus === "cancelled") {
         orders[orderIndex].cancelledAt = new Date();
-        restoreStockOfProducts(orders[orderIndex].products);
+        
+        if (orders[orderIndex].paymentMethod === "online") {
+            orders[orderIndex].paymentStatus = "refunded";
+        }
+        else {
+            orders[orderIndex].paymentStatus = "failed";
+        }
+
+        increaseProductStock(orders[orderIndex].products);
+        decreaseSoldOfProducts(orders[orderIndex].products);
     }
     orders[orderIndex].orderStatus = newStatus;
     await orders[orderIndex].save();

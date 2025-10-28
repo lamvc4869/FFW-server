@@ -1,6 +1,6 @@
 import express from "express";
 import verifyToken from "../middlewares/verifyToken.middleware.js";
-import { verifyUserOrAdmin} from "../middlewares/verifyRole.middleware.js";
+import { verifyUserOrAdmin } from "../middlewares/verifyRole.middleware.js";
 import createCartController from "../controllers/cartControllers/createCart.controller.js";
 import getAllCartsController from "../controllers/cartControllers/getAllCarts.controller.js";
 import addProductToCartController from "../controllers/cartControllers/addProductToCart.controller.js";
@@ -11,13 +11,27 @@ import clearCartController from "../controllers/cartControllers/clearCart.contro
 
 const router = express.Router();
 
-router.get('/my-cart', verifyToken, getCartController);
+router.get("/myCart", verifyToken, getCartController);
 router.get("/", verifyToken, verifyUserOrAdmin, getAllCartsController);
 router.post("/", verifyToken, verifyUserOrAdmin, createCartController);
-router.post("/items", verifyToken, verifyUserOrAdmin, addProductToCartController);
+router.post(
+  "/items",
+  verifyToken,
+  verifyUserOrAdmin,
+  addProductToCartController
+);
 router.delete("/clear", verifyToken, verifyUserOrAdmin, clearCartController);
-router.delete("/:productId", verifyToken, verifyUserOrAdmin, deleteProductFromCartController);
-router.patch("/:productId", verifyToken, verifyUserOrAdmin, updateProductInCartController);
+router.delete(
+  "/:productId",
+  verifyToken,
+  verifyUserOrAdmin,
+  deleteProductFromCartController
+);
+router.patch(
+  "/:productId",
+  verifyToken,
+  verifyUserOrAdmin,
+  updateProductInCartController
+);
 
 export default router;
-
