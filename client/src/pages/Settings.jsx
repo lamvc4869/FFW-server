@@ -177,7 +177,7 @@ const Settings = () => {
       }
 
       const response = await axios.patch(
-        "http://localhost:3000/api/v1/user/change-password",
+        "http://localhost:3000/api/v1/user/changePassword",
         {
           currentPassword: changePassword.currentPassword,
           newPassword: changePassword.newPassword,

@@ -81,7 +81,7 @@ const OrderCard = ({
     try {
       const token = localStorage.getItem("accessToken");
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/admin/order/status/${order._id}`,
+        `http://localhost:3000/api/v1/admin/order/${order._id}/status`,
         { newStatus: selectedStatus },
         {
           headers: {

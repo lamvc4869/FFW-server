@@ -83,7 +83,7 @@ const MyOrders = () => {
       const token = localStorage.getItem("accessToken");
 
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/order/cancel/${selectedOrderId}`,
+        `http://localhost:3000/api/v1/order/${selectedOrderId}/cancel`,
         {},
         {
           headers: {

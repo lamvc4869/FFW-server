@@ -23,7 +23,7 @@ router.get("/users", getAllUsersController);
 router.get("/stats", getUserStatsController);
 router.get("/orders", getAllOrdersController);
 router.delete("/user/:userId", deleteUserController);
-router.patch("/order/status/:orderId", updateOrderStatusController);
+router.patch("/order/:orderId/status", updateOrderStatusController);
 
 router.get('/products', getAllProductsController);
 router.post("/product", upload.array("image", 4), createProductController);

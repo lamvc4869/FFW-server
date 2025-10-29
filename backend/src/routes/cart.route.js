@@ -14,24 +14,9 @@ const router = express.Router();
 router.get("/myCart", verifyToken, getCartController);
 router.get("/", verifyToken, verifyUserOrAdmin, getAllCartsController);
 router.post("/", verifyToken, verifyUserOrAdmin, createCartController);
-router.post(
-  "/items",
-  verifyToken,
-  verifyUserOrAdmin,
-  addProductToCartController
-);
+router.post("/items", verifyToken, verifyUserOrAdmin, addProductToCartController);
 router.delete("/clear", verifyToken, verifyUserOrAdmin, clearCartController);
-router.delete(
-  "/:productId",
-  verifyToken,
-  verifyUserOrAdmin,
-  deleteProductFromCartController
-);
-router.patch(
-  "/:productId",
-  verifyToken,
-  verifyUserOrAdmin,
-  updateProductInCartController
-);
+router.delete("/:productId", verifyToken, verifyUserOrAdmin, deleteProductFromCartController);
+router.patch("/:productId", verifyToken, verifyUserOrAdmin, updateProductInCartController);
 
 export default router;

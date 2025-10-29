@@ -4,6 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import RelatedProducts from "../components/RelatedProducts";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import ReviewModal from "../components/ui/ReviewModal";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 const ProductDetails = () => {
   const { user, refreshCart } = useAppContext();
@@ -16,6 +18,8 @@ const ProductDetails = () => {
   const [thumbnail, setThumbnail] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   // Format price with thousand separator
   const formatPrice = (price) => {
@@ -183,6 +187,75 @@ const ProductDetails = () => {
     }
   };
 
+  // Gửi đánh giá
+  const handleSubmitReview = async (rating) => {
+    setIsSubmittingReview(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/product/${productId}/review`,
+        { rating },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Đánh giá sản phẩm thành công!", {
+          duration: 2000,
+          style: {
+            background: "#10b981",
+            color: "#fff",
+          },
+        });
+        setShowReviewModal(false);
+        // Refresh product data để cập nhật rating
+        const res = await axios.get(
+          `http://localhost:3000/api/v1/product/${productId}`
+        );
+        setProduct(res.data.product);
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      if (error.response?.status === 401) {
+        toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!");
+        navigate("/login");
+      } else {
+        toast.error(
+          error.response?.data?.message || "Có lỗi xảy ra khi đánh giá!"
+        );
+      }
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  // Render stars
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) {
+        stars.push(<FaStar key={i} className="text-yellow-400" />);
+      } else if (i === fullStars + 1 && hasHalfStar) {
+        stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
+      } else {
+        stars.push(<FaRegStar key={i} className="text-gray-300" />);
+      }
+    }
+    return stars;
+  };
+
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>{error}</div>;
 
@@ -232,6 +305,20 @@ const ProductDetails = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
               {product.name}
             </h1>
+
+            {/* Rating Section */}
+            <div className="mb-4 flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                {renderStars(product.averageRating || 0)}
+              </div>
+              <span className="text-lg font-semibold text-gray-800">
+                {product.averageRating?.toFixed(1) || "0.0"}
+              </span>
+              <span className="text-sm text-gray-500">
+                ({product.reviewCount || 0} đánh giá)
+              </span>
+            </div>
+
             {/* Price Section */}
             <div className="mb-6">
               <div className="flex items-baseline gap-2 mb-1">
@@ -248,7 +335,6 @@ const ProductDetails = () => {
                   {formatPrice(product.offerPrice || product.price)} VNĐ
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">(Đã bao gồm thuế)</p>
             </div>
 
             {/* Product Origin and Type */}
@@ -308,28 +394,52 @@ const ProductDetails = () => {
 
             {/* Action Buttons */}
             {user?.role !== "admin" && (
-              <div className="flex flex-col sm:flex-row gap-3 mt-auto">
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  disabled={isAddingToCart || product.stock < 1}
-                  className="flex-1 py-3.5 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isAddingToCart ? "Đang thêm..." : "Thêm vào giỏ hàng"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleBuyNow}
-                  disabled={isAddingToCart || product.stock < 1}
-                  className="flex-1 py-3.5 px-6 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  {isAddingToCart ? "Đang xử lý..." : "Mua ngay"}
-                </button>
-              </div>
+              <>
+                <div className="flex flex-col sm:flex-row gap-3 mt-auto">
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    disabled={isAddingToCart || product.stock < 1}
+                    className="flex-1 py-3.5 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isAddingToCart ? "Đang thêm..." : "Thêm vào giỏ hàng"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBuyNow}
+                    disabled={isAddingToCart || product.stock < 1}
+                    className="flex-1 py-3.5 px-6 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    {isAddingToCart ? "Đang xử lý..." : "Mua ngay"}
+                  </button>
+                </div>
+
+                {/* Review Button - Only for logged in users */}
+                {user && (
+                  <button
+                    type="button"
+                    onClick={() => setShowReviewModal(true)}
+                    className="mt-3 w-full py-3 px-6 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 font-semibold rounded-lg transition-all duration-300 border-2 border-yellow-200 hover:border-yellow-300 flex items-center justify-center gap-2"
+                  >
+                    <FaStar className="text-yellow-500" />
+                    Đánh giá sản phẩm
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        onSubmit={handleSubmitReview}
+        productName={product?.name}
+        isSubmitting={isSubmittingReview}
+      />
+
       {/* Related Products Section */}
       <RelatedProducts currentProduct={product} />
     </div>
