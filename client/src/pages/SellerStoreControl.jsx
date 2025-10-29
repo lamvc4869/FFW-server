@@ -3,6 +3,7 @@ import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { API_URL } from "../utils/constants";
 
 const SellerStoreControl = () => {
   const navigate = useNavigate();
@@ -16,9 +17,12 @@ const SellerStoreControl = () => {
       return toast.error("Admin login required");
     }
     try {
-      const { data } = await axios.get(`/api/v1/admin/product/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await axios.get(
+        `${API_URL}/admin/product/${productId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (data.success) {
         // Force a hard navigation to /seller
         window.location.href = `/seller?edit=${productId}`;
@@ -60,7 +64,7 @@ const SellerStoreControl = () => {
     try {
       const newActive = !product.isActive;
       await axios.patch(
-        `/api/v1/admin/product/${productId}`,
+        `${API_URL}/admin/product/${productId}`,
         { isActive: newActive },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -85,7 +89,7 @@ const SellerStoreControl = () => {
     }
 
     try {
-      await axios.delete(`/api/v1/admin/product/${productToDelete._id}`, {
+      await axios.delete(`${API_URL}/admin/product/${productToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Product deleted successfully");

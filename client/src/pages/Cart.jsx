@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { API_URL } from "../utils/constants";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -36,14 +37,11 @@ const Cart = () => {
           return;
         }
 
-        const response = await axios.get(
-          "http://localhost:3000/api/v1/cart/myCart",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}/cart/myCart`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.data.success) {
           setCart(response.data.cart);
@@ -78,7 +76,7 @@ const Cart = () => {
       const token = localStorage.getItem("accessToken");
 
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/cart/${productId}`,
+        `${API_URL}/cart/${productId}`,
         {
           quantity: newQuantity,
         },
@@ -108,14 +106,11 @@ const Cart = () => {
   const handleRemoveItem = async (productId) => {
     try {
       const token = localStorage.getItem("accessToken");
-      const response = await axios.delete(
-        `http://localhost:3000/api/v1/cart/${productId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.delete(`${API_URL}/cart/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.data.success) {
         setCart(response.data.cart);
@@ -175,15 +170,11 @@ const Cart = () => {
         notes: "",
       };
 
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/order",
-        orderData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.post(`${API_URL}/order`, orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.data.success) {
         toast.success("Đặt hàng thành công!");

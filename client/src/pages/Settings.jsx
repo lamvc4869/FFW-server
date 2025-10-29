@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
 import { FaUser, FaMapMarkerAlt, FaKey } from "react-icons/fa";
+import { API_URL } from "../utils/constants";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -38,14 +39,11 @@ const Settings = () => {
           return;
         }
 
-        const response = await axios.get(
-          `http://localhost:3000/api/v1/user/${user._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}/user/${user._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         console.log("API Response:", response.data);
 
@@ -115,7 +113,7 @@ const Settings = () => {
       }
 
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/user/${user._id}`,
+        `${API_URL}/user/${user._id}`,
         {
           firstName: accountData.firstName,
           lastName: accountData.lastName,
@@ -177,7 +175,7 @@ const Settings = () => {
       }
 
       const response = await axios.patch(
-        "http://localhost:3000/api/v1/user/changePassword",
+        `${API_URL}/user/changePassword`,
         {
           currentPassword: changePassword.currentPassword,
           newPassword: changePassword.newPassword,
@@ -216,7 +214,7 @@ const Settings = () => {
       }
 
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/user/${user._id}`,
+        `${API_URL}/user/${user._id}`,
         {
           address: addressData,
         },
@@ -263,7 +261,7 @@ const Settings = () => {
 
       // Gọi API để upload avatar
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/user/${user._id}`,
+        `${API_URL}/user/${user._id}`,
         formData,
         {
           headers: {

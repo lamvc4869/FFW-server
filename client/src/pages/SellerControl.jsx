@@ -8,6 +8,7 @@ import SellerOrders from "./SellerOrders";
 import toast from "react-hot-toast";
 import { MdAddCircleOutline, MdOutlineInventory2 } from "react-icons/md";
 import { BsBoxSeam } from "react-icons/bs";
+import { API_URL } from "../utils/constants";
 
 const SellerControl = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const SellerControl = () => {
     try {
       const token = localStorage.getItem("accessToken");
       const { data } = await axios.post(
-        "/api/v1/logout",
+        `${API_URL}/logout`,
         {},
         {
           headers: {

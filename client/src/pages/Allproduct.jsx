@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 import axios from "axios";
 import ProductFilter from "../components/ProductFilter";
+import { API_URL } from "../utils/constants";
 
 const Allproduct = () => {
   // State cho danh sách sản phẩm
@@ -30,7 +31,7 @@ const Allproduct = () => {
     const fetchAllProducts = async () => {
       try {
         const accessToken = localStorage.getItem("accessToken");
-        const url = "http://localhost:3000/api/v1/products";
+        const url = `${API_URL}/products`;
         const res = await axios.get(url, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
@@ -76,7 +77,7 @@ const Allproduct = () => {
   const fetchProducts = async (criteria = {}) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const url = "http://localhost:3000/api/v1/products";
+      const url = `${API_URL}/products`;
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${accessToken}` },

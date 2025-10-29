@@ -6,6 +6,7 @@ import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import ReviewModal from "../components/ui/ReviewModal";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import { API_URL } from "../utils/constants";
 
 const ProductDetails = () => {
   const { user, refreshCart } = useAppContext();
@@ -33,9 +34,7 @@ const ProductDetails = () => {
       setError(null);
       try {
         console.log("Fetching product with ID:", productId);
-        const res = await axios.get(
-          `http://localhost:3000/api/v1/product/${productId}`
-        );
+        const res = await axios.get(`${API_URL}/product/${productId}`);
         console.log("API product data:", res.data);
         setProduct(res.data.product);
         if (res.data.product?.image && res.data.product.image.length) {
@@ -79,7 +78,7 @@ const ProductDetails = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:3000/api/v1/cart/items",
+        `${API_URL}/cart/items`,
         {
           products: [
             {
@@ -150,7 +149,7 @@ const ProductDetails = () => {
 
       // Thêm vào giỏ hàng trước
       const response = await axios.post(
-        "http://localhost:3000/api/v1/cart/items",
+        `${API_URL}/cart/items`,
         {
           products: [
             {
@@ -199,7 +198,7 @@ const ProductDetails = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:3000/api/v1/product/${productId}/review`,
+        `${API_URL}/product/${productId}/review`,
         { rating },
         {
           headers: {
@@ -218,9 +217,7 @@ const ProductDetails = () => {
         });
         setShowReviewModal(false);
         // Refresh product data để cập nhật rating
-        const res = await axios.get(
-          `http://localhost:3000/api/v1/product/${productId}`
-        );
+        const res = await axios.get(`${API_URL}/product/${productId}`);
         setProduct(res.data.product);
       }
     } catch (error) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
+import { API_URL } from "../utils/constants";
 
 const SearchProduct = () => {
   const [searchParams] = useSearchParams();
@@ -17,7 +18,7 @@ const SearchProduct = () => {
         setError(null);
 
         const response = await axios.get(
-          `http://localhost:3000/api/v1/product/search?name=${searchQuery}`
+          `${API_URL}/product/search?name=${searchQuery}`
         );
 
         setProducts(response.data.data || []);

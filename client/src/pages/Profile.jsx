@@ -12,6 +12,7 @@ import {
   FaTimesCircle,
   FaCog,
 } from "react-icons/fa";
+import { API_URL } from "../utils/constants";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -31,14 +32,11 @@ const Profile = () => {
 
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await axios.get(
-          "http://localhost:3000/api/v1/order/orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}/order/orders`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         // Xử lý cả trường hợp success: true và success: false
         setOrders(response.data.orders || []);
@@ -136,14 +134,11 @@ const Profile = () => {
         setLoadingUser(true);
         try {
           const token = localStorage.getItem("accessToken");
-          const res = await axios.get(
-            `http://localhost:3000/api/v1/user/${user._id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const res = await axios.get(`${API_URL}/user/${user._id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           if (res.data && res.data.user) {
             setUser(res.data.user);
             localStorage.setItem("user", JSON.stringify(res.data.user));

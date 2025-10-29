@@ -4,6 +4,7 @@ import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { API_URL } from "../utils/constants";
 
 const ProductCard = ({ product }) => {
   const { currency, formatPrice, user, refreshCart } = useAppContext();
@@ -44,7 +45,7 @@ const ProductCard = ({ product }) => {
 
       // Gọi API để thêm sản phẩm vào giỏ hàng
       const response = await axios.post(
-        "http://localhost:3000/api/v1/cart/items",
+        `${API_URL}/cart/items`,
         {
           products: [
             {

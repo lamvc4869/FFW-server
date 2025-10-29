@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { API_URL } from "../utils/constants";
 
 export const AppContext = createContext();
 
@@ -46,7 +47,7 @@ export const AppContextProvider = ({ children }) => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("/api/v1/products");
+      const { data } = await axios.get(`${API_URL}/products`);
       if (data.success) {
         setProducts(data.data || []);
       } else {
