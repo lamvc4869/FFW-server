@@ -1,6 +1,6 @@
 import Product from "../../models/product.model.js";
 
-const updateStockOfProducts = async (cartProducts) => {
+const decreaseProductStock = async (cartProducts) => {
   for (const item of cartProducts) {
     await Product.findByIdAndUpdate(
       item.productId,
@@ -12,7 +12,7 @@ const updateStockOfProducts = async (cartProducts) => {
   }
 };
 
-const restoreStockOfProducts = async (orderProducts) => {
+const increaseProductStock = async (orderProducts) => {
   for (const item of orderProducts) {
     await Product.findByIdAndUpdate(
       item.productId,
@@ -24,4 +24,4 @@ const restoreStockOfProducts = async (orderProducts) => {
   }
 };
 
-export { updateStockOfProducts, restoreStockOfProducts };
+export { decreaseProductStock, increaseProductStock };

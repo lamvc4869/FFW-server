@@ -1,5 +1,6 @@
 import getOrderByIdService from "./getOrderById.service.js";
-import { restoreStockOfProducts } from "../../lib/helpers/updateStock.js";
+import { increaseProductStock } from "../../lib/helpers/updateStock.js";
+import { decreaseSoldOfProducts } from "../../lib/helpers/updateSold.js";
 
 const cancelOrderService = async (userId, orderId) => {
   const order = await getOrderByIdService(userId, orderId);
@@ -16,10 +17,15 @@ const cancelOrderService = async (userId, orderId) => {
   if (order.paymentStatus === "paid") {
     order.paymentStatus = "refunded";
   }
+  else if (order.paymentStatus === "pending") {
+    order.paymentStatus = "failed";
+  }
 
   await order.save();
 
-  await restoreStockOfProducts(order.products);
+  await increaseProductStock(order.products);
+
+  await decreaseSoldOfProducts(order.products);
 
   return "Đơn hàng đã được hủy thành công";
 };

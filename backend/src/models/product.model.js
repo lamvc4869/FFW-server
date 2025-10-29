@@ -43,23 +43,6 @@ const productSchema = new mongoose.Schema(
         origin: {
             type: String,
         },
-        nutritionInfo: {
-            calories: {
-                type: Number,
-            },
-            protein: {
-                type: Number,
-            },
-            carbs: {
-                type: Number,
-            },
-            fat: {
-                type: Number,
-            },
-            fiber: {
-                type: Number,
-            },
-        },
         rating: {
             type: Number,
             default: 0,
