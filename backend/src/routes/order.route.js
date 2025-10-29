@@ -11,6 +11,6 @@ const router = express.Router();
 router.post("/", verifyToken, verifyUser, createOrderController);
 router.get("/orders", verifyToken, verifyUser, getAllOrdersController);
 router.get("/:orderId", verifyToken, verifyUser, getOrderByIdController);
-router.patch("/cancel/:orderId", verifyToken, verifyUser, cancelOrderController);
+router.patch("/:orderId/cancel", verifyToken, verifyUser, cancelOrderController);
 
 export default router;
