@@ -4,6 +4,7 @@ import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import axios from "axios";
 import OrderCard from "../components/OrderCard";
+import { API_URL } from "../utils/constants";
 
 const MyOrders = () => {
   const navigate = useNavigate();
@@ -23,14 +24,11 @@ const MyOrders = () => {
 
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await axios.get(
-          "http://localhost:3000/api/v1/order/orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}/order/orders`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         // Xử lý cả trường hợp success: true và success: false (không có đơn hàng)
         setOrders(response.data.orders || []);
@@ -83,7 +81,7 @@ const MyOrders = () => {
       const token = localStorage.getItem("accessToken");
 
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/order/${selectedOrderId}/cancel`,
+        `${API_URL}/order/${selectedOrderId}/cancel`,
         {},
         {
           headers: {

@@ -4,6 +4,7 @@ import { useAppContext } from "../context/AppContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { categories } from "../images";
 import ProductCard from "../components/ProductCard";
+import { API_URL } from "../utils/constants";
 
 const ProductCategory = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const ProductCategory = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get("http://localhost:3000/api/v1/products");
+        const res = await axios.get(`${API_URL}/products`);
         if (!res.data || !res.data.data) {
           throw new Error("Không thể tải dữ liệu sản phẩm");
         }

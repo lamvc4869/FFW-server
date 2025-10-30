@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { API_URL } from "../utils/constants";
 
 const SellerAddProduct = () => {
   const navigate = useNavigate();
@@ -70,10 +71,10 @@ const SellerAddProduct = () => {
 
         try {
           const { data } = await axios.get(
-            `http://localhost:3000/api/v1/admin/product/${editProductId}`,
+            `${API_URL}/admin/product/${editProductId}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
-          console.log("Origin: ", data.product.origin)
+          console.log("Origin: ", data.product.origin);
           if (data.success) {
             setIsEditing(true);
             setProductToEdit(data.product);
@@ -145,16 +146,14 @@ const SellerAddProduct = () => {
       let response;
       if (isEditing && productToEdit) {
         response = await axios.patch(
-          `http://localhost:3000/api/v1/admin/product/${productToEdit._id}`,
+          `${API_URL}/admin/product/${productToEdit._id}`,
           formData,
           { headers }
         );
       } else {
-        response = await axios.post(
-          "http://localhost:3000/api/v1/admin/product",
-          formData,
-          { headers }
-        );
+        response = await axios.post(`${API_URL}/admin/product`, formData, {
+          headers,
+        });
       }
 
       const { data } = response;

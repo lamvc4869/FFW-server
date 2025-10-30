@@ -4,6 +4,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { images } from "../../images";
 import { useAppContext } from "../../context/AppContext";
 import axios from "axios";
+import { API_URL } from "../../utils/constants";
 
 const NavBar = () => {
   const location = useLocation();
@@ -27,14 +28,11 @@ const NavBar = () => {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
 
-        const response = await axios.get(
-          "http://localhost:3000/api/v1/cart/myCart",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}/cart/myCart`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.data.success && response.data.cart) {
           setCartItemCount(response.data.cart.products?.length || 0);

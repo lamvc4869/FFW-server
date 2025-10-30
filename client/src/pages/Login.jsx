@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useAppContext } from "../context/AppContext";
+import { API_URL } from "../utils/constants";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Login = () => {
     e.preventDefault();
     if (state === "login") {
       try {
-        const res = await axios.post("http://localhost:3000/api/v1/login", {
+        const res = await axios.post(`${API_URL}/login`, {
           email: formData.email,
           password: formData.password,
         });
@@ -45,7 +46,7 @@ const Login = () => {
     } else {
       // Đăng ký tài khoản mới
       try {
-        const res = await axios.post("http://localhost:3000/api/v1/register", {
+        const res = await axios.post(`${API_URL}/register`, {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
@@ -173,9 +174,7 @@ const Login = () => {
 
               <div className="text-center pt-4 border-t border-gray-200">
                 <p className="text-gray-600 text-sm mb-2">
-                  {state === "login"
-                    ? "Mới đến FruitHub?"
-                    : "Đã có tài khoản?"}
+                  {state === "login" ? "Mới đến FruitHub?" : "Đã có tài khoản?"}
                 </p>
                 <button
                   type="button"

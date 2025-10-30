@@ -5,6 +5,7 @@ import axios from "axios";
 import OrderCard from "../components/OrderCard";
 import OrderStatsCard from "../components/OrderStatsCard";
 import OrderFilterTab from "../components/OrderFilterTab";
+import { API_URL } from "../utils/constants";
 
 const SellerOrders = () => {
   const { formatPrice } = useAppContext();
@@ -17,14 +18,11 @@ const SellerOrders = () => {
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await axios.get(
-          "http://localhost:3000/api/v1/admin/orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}/admin/orders`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.data.success) {
           setOrders(response.data.orders || []);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ProductCard from "./ProductCard";
+import { API_URL } from "../utils/constants";
 
 const RelatedProducts = ({ currentProduct }) => {
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -15,14 +16,11 @@ const RelatedProducts = ({ currentProduct }) => {
       setError(null);
       try {
         const token = localStorage.getItem("accessToken");
-        const { data } = await axios.get(
-          "http://localhost:3000/api/v1/products",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const { data } = await axios.get(`${API_URL}/products`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (data.success && data.data) {
           // Lọc sản phẩm cùng category và loại bỏ sản phẩm hiện tại

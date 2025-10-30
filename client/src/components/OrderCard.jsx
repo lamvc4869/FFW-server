@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { API_URL } from "../utils/constants";
 
 const OrderCard = ({
   order,
@@ -81,7 +82,7 @@ const OrderCard = ({
     try {
       const token = localStorage.getItem("accessToken");
       const response = await axios.patch(
-        `http://localhost:3000/api/v1/admin/order/${order._id}/status`,
+        `${API_URL}/admin/order/${order._id}/status`,
         { newStatus: selectedStatus },
         {
           headers: {
